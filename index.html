@@ -1,12 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta name="robots" content="noindex">
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=2026-07-10-sign-in.html">
-  <title>Nysa — prototype</title>
+<meta charset="UTF-8">
+<title>Nysa prototype — all screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<style>
+  body { margin: 0; padding: 48px; font-family: var(--font-sans); background: var(--background); color: var(--foreground); }
+  h1 { font: 600 24px/1.2 var(--font-sans); margin: 0 0 4px; }
+  .sub { font: 400 13px/1.4 var(--font-sans); color: var(--muted-foreground); margin: 0 0 32px; }
+  .group { margin-bottom: 28px; }
+  .group h2 { font: 500 11px/1 var(--font-sans); text-transform: uppercase; letter-spacing: .04em; color: var(--muted-foreground); margin: 0 0 10px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .links a {
+    display: inline-flex; align-items: center; height: 32px; padding: 0 14px;
+    border: 1px solid var(--border); border-radius: 6px; background: var(--background);
+    font: 500 13px/1 var(--font-sans); color: var(--foreground); text-decoration: none;
+  }
+  .links a:hover { background: var(--muted); }
+  .links a span { color: var(--muted-foreground); font-weight: 400; margin-left: 6px; }
+</style>
 </head>
 <body>
-  <p><a href="2026-07-10-sign-in.html">Continue to the Nysa prototype</a></p>
+<h1>Nysa prototype</h1>
+<p class="sub">Every screen, migrated from the frozen Figma reference. Click through — sidebar navigation works on every page.</p>
+
+<div class="group"><h2>Onboarding · M1</h2><div class="links">
+  <a href="2026-07-10-sign-in.html">Sign in</a>
+  <a href="2026-07-10-onboarding.html?reset=1">Onboarding <span>Welcome → workspace ready</span></a>
+</div></div>
+
+<div class="group"><h2>Mission Control</h2><div class="links">
+  <a href="chat.html">Chat</a>
+  <a href="chat-empty.html">Chat <span>new conversation</span></a>
+  <a href="chat-welcome.html">Chat <span>first-run welcome</span></a>
+  <a href="notes.html">Notes</a>
+  <a href="tasks.html">Tasks</a>
+  <a href="tasks-detail.html">Tasks <span>detail open</span></a>
+  <a href="calendar.html">Calendar</a>
+  <a href="calendar-event.html">Calendar <span>event detail</span></a>
+</div></div>
+
+<div class="group"><h2>Workspace</h2><div class="links">
+  <a href="overview.html">Overview <span>workspace home</span></a>
+  <a href="projects.html">Projects</a>
+  <a href="project-bancora.html">Project <span>Bancora Integration</span></a>
+  <a href="meetings.html">Meetings</a>
+  <a href="meeting-bancora.html">Meeting <span>Bancora sync</span></a>
+  <a href="companies.html">Companies</a>
+  <a href="companies-selected.html">Companies <span>drawer open</span></a>
+  <a href="persons.html">Persons</a>
+  <a href="persons-selected.html">Persons <span>drawer open</span></a>
+  <a href="knowledge.html">Knowledge</a>
+  <a href="knowledge-detail.html">Knowledge <span>detail open</span></a>
+  <a href="knowledge-review.html">Knowledge <span>needs review</span></a>
+  <a href="files.html">Files</a>
+  <a href="files-add-drive.html">Files <span>add from Drive</span></a>
+  <a href="document-proposal.html">Document <span>Bancora proposal</span></a>
+  <a href="email-receipt.html">Email <span>capture receipt</span></a>
+  <a href="skills.html">Skills</a>
+  <a href="cron.html">Automations</a>
+  <a href="cron-detail.html">Automations <span>detail open</span></a>
+</div></div>
+
+<div class="group"><h2>Settings</h2><div class="links">
+  <a href="settings.html">Settings</a>
+</div></div>
 </body>
 </html>
