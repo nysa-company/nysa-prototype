@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Overview — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* Overview page (Decision 54B, "Blocks") — page-specific layer only;
+     shared shell/nav/type tokens come from tokens.css + components.css. */
+  .ov-stack { display: flex; flex-direction: column; gap: 24px; max-width: 880px; }
+
+  .ov-header { display: flex; flex-direction: column; gap: 4px; }
+  .ov-subtitle { display: flex; align-items: center; gap: 6px; font: 400 13px/1.4 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+
+  /* Quiet AI-provenance icon + CSS-only tooltip (Decision 54 amendment 1) */
+  .ai-meta { position: relative; display: inline-flex; align-items: center; color: var(--muted-foreground); cursor: default; border-radius: 4px; }
+  .ai-meta svg { width: 16px; height: 16px; display: block; flex-shrink: 0; }
+  .ai-meta .tooltip {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%) translateY(4px);
+    background: var(--foreground);
+    color: #FFFFFF;
+    font: 400 11px/1.4 var(--font-sans);
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+    padding: 6px 10px;
+    border-radius: 6px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 20;
+  }
+  .ai-meta .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--foreground);
+  }
+  .ai-meta:hover .tooltip,
+  .ai-meta:focus-visible .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Brief card */
+  .brief-card { border: 1px solid var(--border); border-radius: var(--r-card); padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; background: var(--background); }
+  .brief-text { display: flex; flex-direction: column; gap: 14px; }
+  .brief-text p { margin: 0; font: 400 14px/1.7 var(--font-sans); color: var(--foreground); }
+  .clients-strip { display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid var(--border); font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); }
+  .clients-strip .clients-label { color: var(--muted-foreground); }
+  .clients-strip a { color: var(--foreground); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 2px; font-weight: 500; }
+  .clients-strip a:hover { text-decoration-color: var(--muted-foreground); }
+  .clients-strip .sep { color: var(--muted-foreground); opacity: 0.6; }
+
+  /* Implied direction band */
+  .direction-band {
+    background: var(--muted);
+    border-left: 3px solid var(--slate-9);
+    border-radius: 0 var(--r-card) var(--r-card) 0;
+    padding: 22px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .direction-label {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 6px;
+    font: 500 11px/1.4 var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--slate-11);
+    border-radius: 4px;
+    cursor: default;
+  }
+  .direction-label svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .direction-text { margin: 0; font: 500 15px/1.6 var(--font-sans); color: var(--foreground); }
+  .direction-label .tooltip {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    transform: translateY(4px);
+    background: var(--foreground);
+    color: #FFFFFF;
+    font: 400 12px/1.4 var(--font-sans);
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+    padding: 6px 10px;
+    border-radius: 6px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 20;
+  }
+  .direction-label .tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 14px;
+    border: 5px solid transparent;
+    border-bottom-color: var(--foreground);
+  }
+  .direction-band:hover .direction-label .tooltip,
+  .direction-label:hover .tooltip,
+  .direction-label:focus-visible .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Currently pushing */
+  .pushing-card { border: 1px solid var(--border); border-radius: var(--r-card); padding: 22px 28px; display: flex; flex-direction: column; gap: 10px; background: var(--background); }
+  .pushing-card p { margin: 0; font: 400 13px/1.7 var(--font-sans); color: var(--foreground); }
+
+  /* Personal — lightweight private variant: header + one quiet placeholder line, no brief card. */
+  .ov-quiet-pulse { font: 400 13px/1.6 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+
+  /* HandyPass — thin-but-honest variant: one paragraph, clearly less rich than Kredi's brief. */
+  .brief-card.thin { padding: 22px 28px; gap: 10px; }
+  .brief-card.thin .brief-text p { font: 400 13px/1.65 var(--font-sans); }
+  .ov-generated-note { margin: 0; font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item active" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="main">
+    <div class="page-wrap">
+
+      <!-- Kredi — full Decision 54B "Blocks" content -->
+      <div class="ov-stack" data-workspace="kredi">
+
+        <div class="ov-header">
+          <h1 class="t-page-title">Kredi</h1>
+          <p class="ov-subtitle">
+            Mortgage lending fintech · Mexico
+            <span class="ai-meta" tabindex="0">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.964L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              <span class="tooltip">Generated from 12 verified pieces · as of Jul 9, 2026, 8:14am</span>
+            </span>
+          </p>
+        </div>
+
+        <div class="brief-card">
+          <div class="brief-text">
+            <p>Kredi is a mortgage lending fintech based in Mexico. It originates and underwrites home loans directly, and partners with retail banks to plug its underwriting and loan-file infrastructure into their consumer-lending channels.</p>
+            <p>Growth comes from closing and renewing partner integrations — Bancora and Altiva are the two active accounts. Delivery work runs through a mortgage underwriting pipeline: loan file intake, a completeness check ("expediente completo"), underwriting review, and funding, with legal review gating any data-sharing terms before a partner integration goes live.</p>
+          </div>
+          <div class="clients-strip">
+            <span class="clients-label">Main clients:</span>
+            <a href="companies-selected.html?id=bancora">Bancora</a>
+            <span class="sep">·</span>
+            <a href="companies-selected.html?id=altiva">Altiva</a>
+          </div>
+        </div>
+
+        <div class="direction-band">
+          <div class="direction-label" tabindex="0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+            Implied direction
+            <span class="tooltip">Inferred from active projects and recent decisions — not a tracked goal.</span>
+          </div>
+          <p class="direction-text">Everything verified so far points one direction: becoming the underwriting and loan-file layer behind retail banks' consumer lending, rather than growing as a standalone originator.</p>
+        </div>
+
+        <div class="pushing-card">
+          <span class="t-section">Currently pushing</span>
+          <p>The near-term focus is Bancora: closing and launching the integration is the active priority, with the proposal now sitting with legal for data-sharing terms. In parallel, the Altiva contract needs to renew before Aug 31, and the board is moving onto a quarterly cadence, with July's agenda under review.</p>
+        </div>
+
+      </div>
+
+      <!-- Personal — lightweight private variant: short header, one quiet line, no company brief. -->
+      <div class="ov-stack" data-workspace="personal">
+        <div class="ov-header">
+          <h1 class="t-page-title">Personal</h1>
+          <p class="ov-subtitle">Your workspace — private, not shared with anyone.</p>
+        </div>
+        <p class="ov-quiet-pulse">1 open task (renew passport) · last activity Jul 3, filing a Q2 expense report.</p>
+      </div>
+
+      <!-- HandyPass — thin-but-honest variant: one short paragraph, visibly less rich than Kredi's brief. -->
+      <div class="ov-stack" data-workspace="handypass">
+        <div class="ov-header">
+          <h1 class="t-page-title">HandyPass</h1>
+          <p class="ov-subtitle">Consumer app · side venture</p>
+        </div>
+        <div class="brief-card thin">
+          <div class="brief-text">
+            <p>HandyPass is a side venture building a consumer app for on-demand home services. It's early — the Stripe account setup is in progress and the landing page copy is still being finalized.</p>
+          </div>
+        </div>
+        <p class="ov-generated-note">Generated from a handful of early notes — most of this workspace hasn't been captured yet.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

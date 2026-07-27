@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Skills — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* Page-specific: Skills library (list + drawer). Card anatomy, connector
+     pills, and the drawer's meta/run-history/reference rows aren't shared
+     components yet — modeled here on knowledge.css's k-row-*/k-meta-*
+     patterns and cron.css's run-history table. */
+  .amber { color: var(--amber-11); }
+  .muted { color: var(--muted-foreground); }
+
+  /* This page reads as a permanent master/detail split (list + drawer shown
+     together, matching the approved mockup), not a modal overlay — so the
+     scrim dims the list for depth but must not swallow clicks on the
+     toolbar chips or other cards behind it. Close stays reachable via the
+     drawer's own X button. */
+  .drawer-scrim { pointer-events: none; }
+  .card.active { border-color: #C7C7C7; background: var(--page-bg); }
+  .sk-summary { font: 400 13px/1.4 var(--font-sans); color: var(--muted-foreground); }
+
+  .sk-row-top { display: flex; align-items: center; gap: 10px; }
+  .sk-row-title { font: 600 14px/1.3 var(--font-sans); color: #000; flex: 1; min-width: 0; }
+  .sk-connectors { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .sk-connector { height: 20px; padding: 0 8px; border-radius: 999px; background: var(--muted); display: inline-flex; align-items: center; gap: 5px; font: 500 11px/1 var(--font-sans); color: var(--foreground); flex-shrink: 0; }
+  .sk-connector svg { width: 12px; height: 12px; color: var(--muted-foreground); flex-shrink: 0; }
+
+  .sk-row-desc { font: 400 13px/1.5 var(--font-sans); color: #000; margin-top: 8px; }
+  .sk-row-meta { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .sk-row-meta .dot { color: var(--border); }
+  .sk-row-meta .amber { color: var(--amber-11); }
+
+  /* Drawer: meta rows (knowledge.css .k-meta-*) */
+  .sk-meta { display: flex; flex-direction: column; gap: 6px; }
+  .sk-meta-row { display: flex; align-items: flex-start; gap: 12px; min-height: 20px; }
+  .sk-meta-label { width: 96px; flex-shrink: 0; font: 400 13px/1.3 var(--font-sans); color: var(--muted-foreground); padding-top: 1px; }
+  .sk-meta-value { font: 400 13px/1.4 var(--font-sans); color: var(--foreground); }
+  .sk-meta-value a { color: var(--foreground); text-decoration: underline; text-decoration-color: var(--border); }
+  .sk-meta-value a:hover { text-decoration-color: currentColor; }
+  .sk-meta-value .muted { color: var(--muted-foreground); }
+  .sk-meta-value .amber { color: var(--amber-11); }
+  .sk-drawer-connector { display: inline-flex; align-items: center; gap: 6px; }
+  .sk-drawer-connector svg { width: 14px; height: 14px; color: var(--muted-foreground); }
+
+  /* Drawer: run history (cron.css .run-history*) */
+  .run-history { display: flex; flex-direction: column; gap: 8px; }
+  .run-history-table { display: flex; flex-direction: column; }
+  .run-history-th { display: flex; padding-bottom: 8px; font: 500 11px/1 var(--font-sans); color: var(--muted-foreground); }
+  .run-history-row { display: flex; align-items: flex-start; padding: 6px 0; font: 400 13px/1.3 var(--font-sans); color: #000; }
+  .rh-run { width: 92px; flex-shrink: 0; }
+  .rh-result { flex: 1; min-width: 0; padding-right: 12px; }
+  .rh-result a { color: #000; text-decoration: underline; text-decoration-color: var(--border); }
+  .rh-result a:hover { text-decoration-color: currentColor; }
+  .rh-status { width: 66px; flex-shrink: 0; display: flex; justify-content: flex-start; }
+
+  /* Drawer: "where it's referenced" rows (knowledge.css .k-conn-row) */
+  .sk-ref-rows { display: flex; flex-direction: column; gap: 8px; }
+  .sk-ref-row { display: flex; align-items: flex-start; gap: 10px; }
+  .sk-ref-row svg { width: 14px; height: 14px; color: var(--muted-foreground); margin-top: 2px; flex-shrink: 0; }
+  .sk-ref-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .sk-ref-main { font: 400 13px/1.3 var(--font-sans); color: #000; }
+  .sk-ref-main a { color: #000; text-decoration: underline; text-decoration-color: var(--border); }
+  .sk-ref-main a:hover { text-decoration-color: currentColor; }
+  .sk-note { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+
+  /* Drawer footer (knowledge.css .k-panel-footer) */
+  .sk-footer { display: flex; align-items: center; gap: 12px; }
+  .sk-footer-link { font: 500 12px/1 var(--font-sans); color: #000; text-decoration: none; }
+  .sk-footer-link:hover { text-decoration: underline; }
+  .sk-footer-dot { color: var(--muted-foreground); font-size: 12px; }
+  .sk-footer-spacer { flex: 1; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item active" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="main">
+    <div class="page-wrap">
+      <div class="page-head">
+        <div>
+          <h1 class="t-page-title">Skills</h1>
+          <p class="page-sub" data-workspace="kredi">How the assistant does specific work in Kredi's systems — a shared library, referenced by tasks and automations.</p>
+          <p class="page-sub" data-workspace="personal">How the assistant does specific work for you — a shared library, referenced by tasks and automations.</p>
+          <p class="page-sub" data-workspace="handypass">How the assistant does specific work in this workspace — a shared library, referenced by tasks and automations.</p>
+        </div>
+      </div>
+
+      <div class="sk-summary" data-workspace="kredi">6 skills · 4 verified · <span class="amber">1 stale</span> · 1 candidate</div>
+
+      <div class="toolbar" data-workspace="kredi">
+        <a class="filter-chip active" href="#" data-filter="all">All</a>
+        <a class="filter-chip" href="#" data-filter="Gmail" data-connector-filter>Gmail</a>
+        <a class="filter-chip" href="#" data-filter="Drive" data-connector-filter>Drive</a>
+        <a class="filter-chip" href="#" data-filter="Slack" data-connector-filter>Slack</a>
+        <a class="filter-chip" href="#" data-filter="Calendar" data-connector-filter>Calendar</a>
+      </div>
+
+      <div class="card-list" data-workspace="kredi">
+
+        <a class="card" href="skills.html?id=bancora-followup" data-category="Gmail" data-connectors="Gmail">
+          <div class="sk-row-top">
+            <div class="sk-row-title">Send a Bancora follow-up email</div>
+            <div class="sk-connectors">
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                Gmail
+              </span>
+            </div>
+            <span class="pill pill-gray">Verified</span>
+          </div>
+          <div class="sk-row-desc">Drafts and sends a follow-up email to a Bancora contact in Javier's voice, referencing whatever's open — the proposal, the redlines, or a prior thread.</div>
+          <div class="sk-row-meta">Used by 1 automation · 9 task runs <span class="dot">·</span> Last run Jul 7, 10:12am</div>
+        </a>
+
+        <a class="card" href="skills.html?id=drive-file-proposal" data-category="Drive" data-connectors="Drive">
+          <div class="sk-row-top">
+            <div class="sk-row-title">File a signed proposal to the right Drive folder</div>
+            <div class="sk-connectors">
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="2" y1="12" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" x2="6.01" y1="16" y2="16"/><line x1="10" x2="10.01" y1="16" y2="16"/></svg>
+                Drive
+              </span>
+            </div>
+            <span class="pill pill-gray">Verified</span>
+          </div>
+          <div class="sk-row-desc">Uploads a finalized proposal or contract into the matching client folder in Drive and links it back to the project.</div>
+          <div class="sk-row-meta">Used by 1 automation · 5 task runs <span class="dot">·</span> Last run Jul 6, 2:00am</div>
+        </a>
+
+        <a class="card" href="skills.html?id=slack-commitment-digest" data-category="Slack" data-connectors="Slack">
+          <div class="sk-row-top">
+            <div class="sk-row-title">Post the weekly commitment digest to Slack</div>
+            <div class="sk-connectors">
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
+                Slack
+              </span>
+            </div>
+            <span class="pill pill-gray">Verified</span>
+          </div>
+          <div class="sk-row-desc">Formats the week's open commitments and what moved into a short digest and posts it to #general — skips posting when nothing changed.</div>
+          <div class="sk-row-meta">Used by 1 automation · 3 task runs <span class="dot">·</span> Last run Jul 4, 4:00pm</div>
+        </a>
+
+        <a class="card" href="skills.html?id=partner-premeeting-digest" data-category="Calendar" data-connectors="Calendar Gmail">
+          <div class="sk-row-top">
+            <div class="sk-row-title">Send the pre-meeting digest for partner syncs</div>
+            <div class="sk-connectors">
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                Calendar
+              </span>
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                Gmail
+              </span>
+            </div>
+            <span class="pill pill-gray">Verified</span>
+          </div>
+          <div class="sk-row-desc">Pulls open items for the upcoming Bancora or Altiva check-in and emails a short prep note ahead of the meeting.</div>
+          <div class="sk-row-meta">Used by 1 automation · 8 task runs <span class="dot">·</span> Last run Jul 6, 8:30am</div>
+        </a>
+
+        <a class="card" href="skills.html?id=slack-incomplete-loan" data-category="Slack" data-connectors="Slack">
+          <div class="sk-row-top">
+            <div class="sk-row-title">Flag an incomplete loan file in Slack</div>
+            <div class="sk-connectors">
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
+                Slack
+              </span>
+            </div>
+            <span class="pill pill-outline">Candidate</span>
+          </div>
+          <div class="sk-row-desc">Notifies the broker and flags the file in Slack the moment a loan file comes in missing a required document — the "expediente incompleto" workaround.</div>
+          <div class="sk-row-meta">Proposed from 3 of Javier's notes · not yet used by an automation <span class="dot">·</span> Last run Jul 8, 11:20am</div>
+        </a>
+
+        <a class="card" href="skills.html?id=expediente-checkin-email" data-category="Gmail" data-connectors="Gmail">
+          <div class="sk-row-top">
+            <div class="sk-row-title">Send the expediente-completo check-in email</div>
+            <div class="sk-connectors">
+              <span class="sk-connector">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                Gmail
+              </span>
+            </div>
+            <span class="pill pill-amber">Stale</span>
+          </div>
+          <div class="sk-row-desc">Emails underwriting a daily reminder to confirm new loan files meet the completeness checklist before review.</div>
+          <div class="sk-row-meta">Used by 12 task runs <span class="dot">·</span> <span class="amber">Last run May 5 — past the 60-day review window</span></div>
+        </a>
+
+      </div>
+
+      <!-- Personal skills (Decision 30A pattern): its own small, honest set —
+           never Kredi's skills under the Personal workspace. -->
+      <div class="card-list" data-workspace="personal">
+        <a class="card" href="#" data-toast="Not in this prototype yet">
+          <div class="sk-row-top">
+            <div class="sk-row-title">Draft a packing and documents checklist before a trip</div>
+            <span class="pill pill-outline">Candidate</span>
+          </div>
+          <div class="sk-row-desc">Pulls the trip's dates and destination and drafts a packing list plus a reminder of which travel documents to check.</div>
+          <div class="sk-row-meta">Proposed from 1 of Javier's notes · not yet used by an automation</div>
+        </a>
+      </div>
+
+      <!-- HandyPass empty state (Decision 27A pattern) -->
+      <div class="list-empty" data-workspace="handypass">
+        <div class="list-empty-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg></div>
+        <div class="list-empty-line1">Nothing here yet in this workspace</div>
+        <div class="list-empty-line2">Skills are filed here automatically as tasks and automations are built.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER (Kredi only — populated by the inline script below) -->
+  <div data-workspace="kredi">
+    <div class="drawer-scrim" onclick="location.href='skills.html'"></div>
+    <div class="drawer">
+      <div class="drawer-head">
+        <h2 class="drawer-title" id="drawer-title">Send a Bancora follow-up email</h2>
+        <a class="icon-btn" href="skills.html" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </a>
+      </div>
+
+      <div class="sk-meta" id="drawer-meta">
+        <div class="sk-meta-row">
+          <div class="sk-meta-label">Trust</div>
+          <div class="sk-meta-value">Verified · last verified Jul 7</div>
+        </div>
+        <div class="sk-meta-row">
+          <div class="sk-meta-label">Connector</div>
+          <div class="sk-meta-value">
+            <span class="sk-drawer-connector">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              Gmail — javier@kredi.mx
+            </span>
+          </div>
+        </div>
+        <div class="sk-meta-row">
+          <div class="sk-meta-label">Autonomy</div>
+          <div class="sk-meta-value">Drafts automatically · sends only after your approval</div>
+        </div>
+        <div class="sk-meta-row" id="drawer-derives-row">
+          <div class="sk-meta-label">Derives from</div>
+          <div class="sk-meta-value"><a href="knowledge.html">Client follow-up cadence (Bancora)</a> <span class="muted">— Functional process · Verified</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="t-section">What it does</div>
+        <p class="t-body" id="drawer-what" style="margin:8px 0 0;">Drafts a follow-up email to a Bancora contact — Marco Del Toro or Ana Reyes — in Javier's voice, referencing whatever's open: the proposal, the redlines, or a prior thread. Holds the draft for approval before sending, per the workspace's send-email autonomy setting.</p>
+      </div>
+
+      <div class="run-history" id="run-history">
+        <div class="t-section">Run history</div>
+        <div class="run-history-table" id="drawer-run-history-table">
+          <div class="run-history-th">
+            <div class="rh-run">RUN</div>
+            <div class="rh-result">RESULT</div>
+            <div class="rh-status">STATUS</div>
+          </div>
+          <div class="run-history-row">
+            <div class="rh-run">Jul 7, 10:12</div>
+            <div class="rh-result">Sent to Marco Del Toro · proposal follow-up → <a href="tasks-detail.html?id=t1">view task</a></div>
+            <div class="rh-status"><span class="pill pill-green">Sent</span></div>
+          </div>
+          <div class="run-history-row">
+            <div class="rh-run">Jul 3, 09:40</div>
+            <div class="rh-result">Sent to Ana Reyes · redlines review follow-up → <a href="tasks-detail.html?id=t6">view task</a></div>
+            <div class="rh-status"><span class="pill pill-green">Sent</span></div>
+          </div>
+          <div class="run-history-row">
+            <div class="rh-run">Jun 28, 15:15</div>
+            <div class="rh-result">Draft held for approval · edited before sending → <a href="tasks-detail.html?id=t5">view task</a></div>
+            <div class="rh-status"><span class="pill pill-gray">Edited</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="drawer-refs-block">
+        <div class="t-section">Where it's referenced</div>
+        <div class="sk-ref-rows" style="margin-top:10px;">
+          <div class="sk-ref-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+            <div class="sk-ref-text">
+              <span class="sk-ref-main">Task: <a href="tasks-detail.html?id=t1">Send Bancora integration proposal</a></span>
+            </div>
+          </div>
+          <div class="sk-ref-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <div class="sk-ref-text">
+              <span class="sk-ref-main">Automation: <a href="cron.html">Commitment sweep</a></span>
+            </div>
+          </div>
+          <div class="sk-ref-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+            <div class="sk-ref-text">
+              <span class="sk-ref-main">Project: <a href="project-bancora.html">Bancora Integration</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sk-footer">
+        <a class="sk-footer-link" href="#run-history">Run history</a>
+        <span class="sk-footer-dot">·</span>
+        <a class="sk-footer-link" href="#" data-toast="Not in this prototype yet">Pause</a>
+        <span class="sk-footer-dot">·</span>
+        <a class="sk-footer-link" href="#" data-toast="Not in this prototype yet">Ask about this skill</a>
+        <span class="sk-footer-spacer"></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="assets/records.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// Skills library (D19 pattern): the flagship "Send a Bancora follow-up
+// email" keeps its fully authored drawer, hardcoded above. Every other
+// skill is a thin real shell — own real name/description/meta, swapped in
+// from this map, never the flagship's content under a different name.
+var SKILLS = {
+  'bancora-followup': { flagship: true },
+  'drive-file-proposal': {
+    title: 'File a signed proposal to the right Drive folder',
+    trust: 'Verified · last run Jul 6, 2:00am',
+    connectorHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" x2="2" y1="12" y2="12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" x2="6.01" y1="16" y2="16"/><line x1="10" x2="10.01" y1="16" y2="16"/></svg>Drive — Kredi shared drive',
+    autonomy: 'Files automatically · no approval required',
+    what: 'Uploads a finalized proposal or contract into the matching client folder in Drive and links it back to the project.',
+    meta: 'Used by 1 automation · 5 task runs · Last run Jul 6, 2:00am'
+  },
+  'slack-commitment-digest': {
+    title: 'Post the weekly commitment digest to Slack',
+    trust: 'Verified · last run Jul 4, 4:00pm',
+    connectorHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>Slack — #general',
+    autonomy: 'Posts automatically · no approval required',
+    what: 'Formats the week\u2019s open commitments and what moved into a short digest and posts it to #general — skips posting when nothing changed.',
+    meta: 'Used by 1 automation · 3 task runs · Last run Jul 4, 4:00pm'
+  },
+  'partner-premeeting-digest': {
+    title: 'Send the pre-meeting digest for partner syncs',
+    trust: 'Verified · last run Jul 6, 8:30am',
+    connectorHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>Calendar + Gmail — javier@kredi.mx',
+    autonomy: 'Sends automatically · no approval required (internal prep note)',
+    what: 'Pulls open items for the upcoming Bancora or Altiva check-in and emails a short prep note ahead of the meeting.',
+    meta: 'Used by 1 automation · 8 task runs · Last run Jul 6, 8:30am'
+  },
+  'slack-incomplete-loan': {
+    title: 'Flag an incomplete loan file in Slack',
+    trust: 'Candidate · not yet reviewed',
+    connectorHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>Slack — #general',
+    autonomy: 'Not yet enabled — pending review before it can run automatically',
+    what: 'Notifies the broker and flags the file in Slack the moment a loan file comes in missing a required document — the \u201cexpediente incompleto\u201d workaround.',
+    meta: 'Proposed from 3 of Javier\u2019s notes · not yet used by an automation · Last run Jul 8, 11:20am'
+  },
+  'expediente-checkin-email': {
+    title: 'Send the expediente-completo check-in email',
+    trust: 'Stale · last verified May 5 — past the 60-day review window',
+    trustAmber: true,
+    connectorHTML: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Gmail — javier@kredi.mx',
+    autonomy: 'Sends automatically · no approval required',
+    what: 'Emails underwriting a daily reminder to confirm new loan files meet the completeness checklist before review.',
+    meta: 'Used by 12 task runs · <span class="amber">Last run May 5 — past the 60-day review window</span>'
+  }
+};
+
+var SKID = new URLSearchParams(location.search).get('id') || 'bancora-followup';
+if (!SKILLS[SKID]) SKID = 'bancora-followup';
+
+document.querySelectorAll('.card-list[data-workspace="kredi"] .card').forEach(function (c) {
+  c.classList.toggle('active', c.getAttribute('href') === 'skills.html?id=' + SKID);
+});
+
+if (SKID !== 'bancora-followup') {
+  var S = SKILLS[SKID];
+  document.getElementById('drawer-title').textContent = S.title;
+  document.getElementById('drawer-meta').innerHTML =
+    '<div class="sk-meta-row"><div class="sk-meta-label">Trust</div><div class="sk-meta-value' + (S.trustAmber ? ' amber' : '') + '">' + S.trust + '</div></div>' +
+    '<div class="sk-meta-row"><div class="sk-meta-label">Connector</div><div class="sk-meta-value"><span class="sk-drawer-connector">' + S.connectorHTML + '</span></div></div>' +
+    '<div class="sk-meta-row"><div class="sk-meta-label">Autonomy</div><div class="sk-meta-value">' + S.autonomy + '</div></div>' +
+    '<div class="sk-meta-row"><div class="sk-meta-label">Derives from</div><div class="sk-meta-value muted">Not modeled in this prototype yet.</div></div>';
+  document.getElementById('drawer-what').textContent = S.what;
+  document.getElementById('run-history').innerHTML =
+    '<div class="t-section">Run history</div><p class="sk-note">Not modeled in this prototype yet — see the meta line on the card: ' + S.meta + '</p>';
+  document.getElementById('drawer-refs-block').innerHTML =
+    '<div class="t-section">Where it\u2019s referenced</div><p class="sk-note" style="margin-top:10px;">Not modeled in this prototype yet.</p>';
+}
+
+// Connector chips reuse app.js's data-filter/data-category mechanism as-is
+// (exact match — fine for every single-connector card). This listener runs
+// after app.js's own chip handler and only adds back cards that carry more
+// than one connector (space-separated data-connectors) so multi-connector
+// skills (the partner pre-meeting digest) surface under every connector
+// chip they actually use, without touching app.js.
+document.addEventListener('click', function (e) {
+  var chip = e.target.closest('[data-connector-filter]');
+  if (!chip) return;
+  var filter = chip.getAttribute('data-filter');
+  document.querySelectorAll('[data-workspace="kredi"] [data-connectors]').forEach(function (c) {
+    var connectors = c.getAttribute('data-connectors').split(/\s+/);
+    if (connectors.indexOf(filter) !== -1) c.hidden = false;
+  });
+});
+</script>
+</body>
+</html>

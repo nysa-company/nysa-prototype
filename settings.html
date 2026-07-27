@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Settings — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* Settings full-window takeover (Decision 28, option B) — dedicated layout,
+     no main app sidebar. Reuses tokens/components; page-local layout only. */
+  body { background: var(--background); }
+  .settings-shell { display: flex; height: 100vh; }
+  .settings-nav {
+    width: 255px; flex-shrink: 0; background: #FAFAFA; border-right: 1px solid var(--border);
+    padding: 20px 12px; display: flex; flex-direction: column; height: 100vh; overflow: auto;
+  }
+  .settings-back {
+    display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+    font: 500 12px/1.3 var(--font-sans); color: var(--muted-foreground); padding: 0 8px 20px;
+  }
+  .settings-back:hover { color: var(--foreground); }
+  .settings-back svg { width: 13px; height: 13px; }
+  .settings-nav-group { margin-bottom: 18px; }
+  .settings-nav-label {
+    font: 500 10px/1.4 var(--font-sans); text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted-foreground); padding: 0 8px 6px;
+  }
+  .settings-item {
+    display: block; padding: 7px 8px; border-radius: 6px; font: 400 13px/1.3 var(--font-sans);
+    color: var(--foreground); cursor: pointer; text-decoration: none;
+  }
+  .settings-item:hover { background: #F0F2F4; }
+  .settings-item.active { background: #F0F2F4; font-weight: 500; }
+  .settings-panel { flex: 1; overflow: auto; padding: 32px 40px; }
+  .settings-panel .sec { display: none; max-width: 620px; }
+  .settings-panel .sec.active { display: block; }
+  .settings-panel h2 { font: 600 20px/1.3 var(--font-sans); margin: 0 0 4px; }
+  .settings-panel .sub { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 0 0 24px; }
+
+  .conn-row, .autonomy-row, .toggle-row, .member-row, .activity-row {
+    display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .conn-row:last-child, .autonomy-row:last-child, .toggle-row:last-child,
+  .member-row:last-child, .activity-row:last-child { border-bottom: none; }
+  .conn-icon {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--muted); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font-sans); color: var(--muted-foreground);
+  }
+  .autonomy-group {
+    font: 600 11px/1.3 var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted-foreground); margin: 24px 0 4px;
+  }
+  .autonomy-group:first-of-type { margin-top: 0; }
+  .conn-name, .autonomy-cat, .toggle-name, .member-name { font: 500 13px/1.3 var(--font-sans); }
+  .conn-sub, .autonomy-sub, .toggle-sub, .member-sub { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); margin-top: 2px; }
+  .row-text { flex: 1; min-width: 0; }
+
+  .segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+  .segmented-option { padding: 6px 14px; font: 500 12px/1 var(--font-sans); color: var(--muted-foreground); cursor: pointer; user-select: none; }
+  .segmented-option.active { background: var(--iris-9); color: #fff; }
+
+  .switch { width: 36px; height: 20px; border-radius: 999px; background: var(--border); position: relative; cursor: pointer; flex-shrink: 0; }
+  .switch.on { background: var(--iris-9); }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 999px; background: #fff; transition: left .15s ease; }
+  .switch.on::after { left: 18px; }
+
+  .member-avatar { width: 32px; height: 32px; border-radius: 999px; background: var(--muted); display: flex; align-items: center; justify-content: center; font: 600 11px/1 var(--font-sans); color: var(--muted-foreground); flex-shrink: 0; }
+
+  .activity-row { align-items: flex-start; }
+  .activity-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--muted-foreground); margin-top: 6px; flex-shrink: 0; }
+  .activity-text { font: 400 13px/1.4 var(--font-sans); flex: 1; }
+  .activity-time { font: 400 11px/1.4 var(--font-mono); color: var(--muted-foreground); white-space: nowrap; }
+
+  .section-actions { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="settings-shell">
+  <div class="settings-nav">
+    <a class="settings-back" href="tasks.html" id="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      Back to Kredi
+    </a>
+    <div class="settings-nav-group">
+      <div class="settings-nav-label">Workspace</div>
+      <div class="settings-item" data-section="members">Members</div>
+      <div class="settings-item" data-section="connections">Connections &amp; health</div>
+      <div class="settings-item" data-section="autonomy">Autonomy</div>
+      <div class="settings-item" data-section="recording">Recording &amp; privacy</div>
+    </div>
+    <div class="settings-nav-group">
+      <div class="settings-nav-label">Account</div>
+      <div class="settings-item" data-section="notifications">Notifications</div>
+      <div class="settings-item" data-section="security">Security</div>
+      <div class="settings-item" data-section="activity">Activity history</div>
+    </div>
+  </div>
+
+  <div class="settings-panel">
+
+    <!-- Members -->
+    <div class="sec" id="sec-members">
+      <h2>Members</h2>
+      <p class="sub">Everyone with access to the Kredi workspace.</p>
+      <div class="member-row">
+        <div class="member-avatar">JA</div>
+        <div class="row-text"><div class="member-name">Javier Aldape</div><div class="member-sub">javier@kredi.mx</div></div>
+        <span class="pill pill-gray">Owner</span>
+      </div>
+      <div class="member-row">
+        <div class="member-avatar">RS</div>
+        <div class="row-text"><div class="member-name">Renata Solís</div><div class="member-sub">renata@kredi.mx</div></div>
+        <span class="pill pill-outline">Member</span>
+      </div>
+      <div class="member-row">
+        <div class="member-avatar">DP</div>
+        <div class="row-text"><div class="member-name">Diego Palafox</div><div class="member-sub">diego@kredi.mx</div></div>
+        <span class="pill pill-outline">Member</span>
+      </div>
+      <div class="section-actions">
+        <button type="button" class="btn btn-secondary btn-sm" data-toast="Not in this prototype yet">Invite member</button>
+      </div>
+    </div>
+
+    <!-- Connections & health -->
+    <div class="sec" id="sec-connections">
+      <h2>Connections &amp; health</h2>
+      <p class="sub">Connectors belong to you and route to a default workspace. Each one's health is checked continuously — failures surface here and as a repair item on My board.</p>
+      <div class="conn-row">
+        <div class="conn-icon">Cal</div>
+        <div class="row-text"><div class="conn-name">Google Calendar — work</div><div class="conn-sub">javier@kredi.mx · routes to Kredi</div></div>
+        <span class="pill pill-green">Connected</span>
+      </div>
+      <div class="conn-row">
+        <div class="conn-icon">Gm</div>
+        <div class="row-text"><div class="conn-name">Gmail — personal</div><div class="conn-sub">javier@gmail.com · routes to Personal</div></div>
+        <span class="pill pill-red">Needs re-auth</span>
+      </div>
+      <div class="conn-row">
+        <div class="conn-icon">Dr</div>
+        <div class="row-text"><div class="conn-name">Google Drive — Kredi shared drive</div><div class="conn-sub">12 folders indexed · last sync 4m ago</div></div>
+        <span class="pill pill-green">Connected</span>
+      </div>
+    </div>
+
+    <!-- Autonomy -->
+    <div class="sec" id="sec-autonomy">
+      <h2>Autonomy</h2>
+      <p class="sub">Trust is earned per action type, not globally. Each action runs on Auto (acts and logs a receipt) or waits for your approval on My board.</p>
+      <div class="autonomy-group">Keeping your memory up to date</div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Add or update people</div>
+          <div class="autonomy-sub">New contacts and detail changes from meetings and email</div>
+        </div>
+        <div class="segmented"><span class="segmented-option active">Auto</span><span class="segmented-option">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Add or update companies</div>
+          <div class="autonomy-sub">New companies and fact changes, including the one-liner</div>
+        </div>
+        <div class="segmented"><span class="segmented-option active">Auto</span><span class="segmented-option">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Create and update tasks</div>
+          <div class="autonomy-sub">Commitments made in meetings and emails become tracked tasks</div>
+        </div>
+        <div class="segmented"><span class="segmented-option active">Auto</span><span class="segmented-option">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Save meeting takeaways</div>
+          <div class="autonomy-sub">Decisions, processes, and facts filed into Knowledge</div>
+        </div>
+        <div class="segmented"><span class="segmented-option">Auto</span><span class="segmented-option active">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Change goals (OKRs)</div>
+          <div class="autonomy-sub">Edits to company goals are never automatic</div>
+        </div>
+        <div class="segmented"><span class="segmented-option active">Always requires approval</span></div>
+      </div>
+      <div class="autonomy-group">Acting on your behalf</div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Draft emails</div>
+          <div class="autonomy-sub">Drafts are prepared and attached to the task — nothing is sent</div>
+        </div>
+        <div class="segmented"><span class="segmented-option active">Auto</span><span class="segmented-option">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Send emails</div>
+          <div class="autonomy-sub">Every outgoing email waits for your OK by default</div>
+        </div>
+        <div class="segmented"><span class="segmented-option">Auto</span><span class="segmented-option active">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Change your calendar</div>
+          <div class="autonomy-sub">Scheduling, reschedules, and invites</div>
+        </div>
+        <div class="segmented"><span class="segmented-option">Auto</span><span class="segmented-option active">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Post to Slack</div>
+          <div class="autonomy-sub">Messages and nudges in connected channels</div>
+        </div>
+        <div class="segmented"><span class="segmented-option">Auto</span><span class="segmented-option active">Requires approval</span></div>
+      </div>
+      <div class="autonomy-row">
+        <div class="row-text">
+          <div class="autonomy-cat">Share your private notes</div>
+          <div class="autonomy-sub">Publishing anything private into shared Knowledge</div>
+        </div>
+        <div class="segmented"><span class="segmented-option active">Always requires approval</span></div>
+      </div>
+    </div>
+
+    <!-- Recording & privacy -->
+    <div class="sec" id="sec-recording">
+      <h2>Recording &amp; privacy</h2>
+      <p class="sub">Controls for how meetings are captured and what's shared across the workspace.</p>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Record work calendar meetings</div><div class="toggle-sub">On by default · audio-only, video context off</div></div>
+        <div class="switch on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Share busy/free instead of event details</div><div class="toggle-sub">Others in the workspace see only that you're busy, not the meeting content</div></div>
+        <div class="switch" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Transcript retention</div><div class="toggle-sub">Transcripts kept 12 months, then deleted</div></div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="sec" id="sec-notifications">
+      <h2>Notifications</h2>
+      <p class="sub">What Nysa surfaces to you outside the app, and how often.</p>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Daily brief</div><div class="toggle-sub">A short summary of what changed since yesterday</div></div>
+        <div class="switch on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Approvals waiting</div><div class="toggle-sub">Ping when something needs your approval on My board</div></div>
+        <div class="switch on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Weekly digest</div><div class="toggle-sub">A Monday-morning roundup of the past week across your workspaces</div></div>
+        <div class="switch" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="sec" id="sec-security">
+      <h2>Security</h2>
+      <p class="sub">Manage where you're signed in and how your account is protected.</p>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Active sessions</div><div class="toggle-sub">2 devices signed in · this Mac, iPhone</div></div>
+        <button type="button" class="btn btn-secondary btn-sm" data-toast="Signed out of all other sessions">Sign out all</button>
+      </div>
+      <div class="toggle-row">
+        <div class="row-text"><div class="toggle-name">Two-factor authentication</div><div class="toggle-sub">Not enabled</div></div>
+        <button type="button" class="btn btn-secondary btn-sm" data-toast="Not in this prototype yet">Enable</button>
+      </div>
+    </div>
+
+    <!-- Activity history -->
+    <div class="sec" id="sec-activity">
+      <h2>Activity history</h2>
+      <p class="sub">Everything Nysa has done — auto or approved — with one-click undo where reversible.</p>
+      <div class="activity-row"><div class="activity-dot"></div><div class="activity-text">Drafted Bancora integration proposal — waiting on your approval</div><div class="activity-time">Jul 7, 09:40</div></div>
+      <div class="activity-row"><div class="activity-dot"></div><div class="activity-text">Sent thank-you note to Ana Reyes</div><div class="activity-time">Jul 7, 09:15</div></div>
+      <div class="activity-row"><div class="activity-dot"></div><div class="activity-text">Created 3 tasks from commitments in Bancora sync</div><div class="activity-time">Jul 6, 15:10</div></div>
+      <div class="activity-row"><div class="activity-dot"></div><div class="activity-text">Filed 2 knowledge pieces from Bancora sync</div><div class="activity-time">Jul 6, 15:07</div></div>
+      <div class="activity-row"><div class="activity-dot"></div><div class="activity-text">Filed Marco Del Toro and Ana Reyes as new persons under Bancora</div><div class="activity-time">Jul 6, 15:04</div></div>
+      <div class="activity-row"><div class="activity-dot"></div><div class="activity-text">Sent redlines to legal, awaiting review</div><div class="activity-time">Jul 6, 14:52</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+  (function () {
+    var ws = localStorage.getItem('nysa-workspace') || 'kredi';
+    var names = { kredi: 'Kredi', personal: 'Personal', handypass: 'HandyPass' };
+    var backLinks = { kredi: 'tasks.html', personal: 'tasks.html', handypass: 'tasks.html' };
+    var back = document.getElementById('back-link');
+    back.lastChild.textContent = ' Back to ' + (names[ws] || 'Kredi');
+    back.setAttribute('href', backLinks[ws] || 'tasks.html');
+
+    var items = document.querySelectorAll('.settings-item');
+    var sections = document.querySelectorAll('.sec');
+    function show(id) {
+      if (!document.getElementById('sec-' + id)) id = 'connections';
+      items.forEach(function (i) { i.classList.toggle('active', i.getAttribute('data-section') === id); });
+      sections.forEach(function (s) { s.classList.toggle('active', s.id === 'sec-' + id); });
+    }
+    items.forEach(function (item) {
+      item.addEventListener('click', function () {
+        var id = item.getAttribute('data-section');
+        location.hash = id;
+        show(id);
+      });
+    });
+    window.addEventListener('hashchange', function () {
+      show(location.hash.replace('#', '') || 'connections');
+    });
+    show(location.hash.replace('#', '') || 'connections');
+  })();
+</script>
+</body>
+</html>

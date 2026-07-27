@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Persons — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<style>
+  /* Persons grid: avatar / name / relationship / company / title / row menu (R1-D1, R2-D10) */
+  .cols-persons { grid-template-columns: 32px 200px 100px 140px 1fr 32px; }
+  .cols-persons .th-person { grid-column: span 2; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item active" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="main">
+    <div class="page-wrap">
+      <div class="page-head">
+        <div>
+          <h1 class="t-page-title">Persons</h1>
+          <p class="page-sub">Every person in your workspace.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('new-person-overlay').hidden=false">New person</button>
+      </div>
+
+      <div class="toolbar" data-workspace="kredi handypass">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="search" type="text" placeholder="Search persons...">
+        </div>
+        <div class="chip-group" data-facet-filter="relationship">
+          <button type="button" class="filter-chip facet-option active" data-filter="all">All</button>
+          <button type="button" class="filter-chip facet-option" data-filter="employee">Employees</button>
+          <button type="button" class="filter-chip facet-option" data-filter="partner">Partners</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="table-head cols-persons" data-workspace="kredi handypass">
+          <div class="th-person">Person</div>
+          <div>Relationships</div>
+          <div>Company</div>
+          <div>Title</div>
+        </div>
+
+        <a class="table-row cols-persons" href="persons-selected.html?id=javier" data-workspace="kredi" data-search="javier aldape employee kredi fintech exec" data-relationship="employee">
+          <span class="avatar">JA</span>
+          <span class="cell-title">Javier Aldape</span>
+          <span><span class="pill pill-gray">Employee</span></span>
+          <span><span class="chip">Kredi</span></span>
+          <span class="cell-dim">Fintech exec</span>
+          <span class="row-menu" onclick="event.preventDefault()">
+            <button class="icon-btn" data-menu tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+            <div class="menu-popover">
+              <div class="menu-item" onclick="location.href='persons-selected.html?id=javier'">Open</div>
+              <div class="menu-item" data-toast="Not in this prototype yet">Edit</div>
+              <div class="menu-item danger" data-toast="Person deleted">Delete</div>
+            </div>
+          </span>
+        </a>
+
+        <a class="table-row cols-persons" href="persons-selected.html?id=marco" data-workspace="kredi" data-search="marco del toro partner bancora relationship lead" data-relationship="partner">
+          <span class="avatar">MD</span>
+          <span class="cell-title">Marco Del Toro</span>
+          <span><span class="pill pill-gray">Partner</span></span>
+          <span><span class="chip">Bancora</span></span>
+          <span class="cell-dim">Relationship lead</span>
+          <span class="row-menu" onclick="event.preventDefault()">
+            <button class="icon-btn" data-menu tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+            <div class="menu-popover">
+              <div class="menu-item" onclick="location.href='persons-selected.html?id=marco'">Open</div>
+              <div class="menu-item" data-toast="Not in this prototype yet">Edit</div>
+              <div class="menu-item danger" data-toast="Person deleted">Delete</div>
+            </div>
+          </span>
+        </a>
+
+        <a class="table-row cols-persons" href="persons-selected.html?id=ana" data-workspace="kredi" data-search="ana reyes partner bancora ops" data-relationship="partner">
+          <span class="avatar">AR</span>
+          <span class="cell-title">Ana Reyes</span>
+          <span><span class="pill pill-gray">Partner</span></span>
+          <span><span class="chip">Bancora</span></span>
+          <span class="cell-dim">Ops</span>
+          <span class="row-menu" onclick="event.preventDefault()">
+            <button class="icon-btn" data-menu tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+            <div class="menu-popover">
+              <div class="menu-item" onclick="location.href='persons-selected.html?id=ana'">Open</div>
+              <div class="menu-item" data-toast="Not in this prototype yet">Edit</div>
+              <div class="menu-item danger" data-toast="Person deleted">Delete</div>
+            </div>
+          </span>
+        </a>
+
+        <a class="table-row cols-persons" href="persons-selected.html?id=laura" data-workspace="kredi" data-search="laura jiménez employee kredi legal counsel" data-relationship="employee">
+          <span class="avatar">LJ</span>
+          <span class="cell-title">Laura Jiménez</span>
+          <span><span class="pill pill-gray">Employee</span></span>
+          <span><span class="chip">Kredi</span></span>
+          <span class="cell-dim">Legal counsel</span>
+          <span class="row-menu" onclick="event.preventDefault()">
+            <button class="icon-btn" data-menu tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+            <div class="menu-popover">
+              <div class="menu-item" onclick="location.href='persons-selected.html?id=laura'">Open</div>
+              <div class="menu-item" data-toast="Not in this prototype yet">Edit</div>
+              <div class="menu-item danger" data-toast="Person deleted">Delete</div>
+            </div>
+          </span>
+        </a>
+
+        <a class="table-row cols-persons" href="persons-selected.html?id=carlos" data-workspace="kredi" data-search="carlos nuñez partner altiva relationship manager" data-relationship="partner">
+          <span class="avatar">CN</span>
+          <span class="cell-title">Carlos Nuñez</span>
+          <span><span class="pill pill-gray">Partner</span></span>
+          <span><span class="chip">Altiva</span></span>
+          <span class="cell-dim">Relationship manager</span>
+          <span class="row-menu" onclick="event.preventDefault()">
+            <button class="icon-btn" data-menu tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+            <div class="menu-popover">
+              <div class="menu-item" onclick="location.href='persons-selected.html?id=carlos'">Open</div>
+              <div class="menu-item" data-toast="Not in this prototype yet">Edit</div>
+              <div class="menu-item danger" data-toast="Person deleted">Delete</div>
+            </div>
+          </span>
+        </a>
+
+        <a class="table-row cols-persons" href="persons-selected.html?id=peter" data-workspace="handypass" data-search="peter kim employee handypass co-founder" data-relationship="employee">
+          <span class="avatar">PK</span>
+          <span class="cell-title">Peter Kim</span>
+          <span><span class="pill pill-gray">Employee</span></span>
+          <span><span class="chip">HandyPass</span></span>
+          <span class="cell-dim">Co-founder</span>
+          <span class="row-menu" onclick="event.preventDefault()">
+            <button class="icon-btn" data-menu tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+            <div class="menu-popover">
+              <div class="menu-item" onclick="location.href='persons-selected.html?id=peter'">Open</div>
+              <div class="menu-item" data-toast="Not in this prototype yet">Edit</div>
+              <div class="menu-item danger" data-toast="Person deleted">Delete</div>
+            </div>
+          </span>
+        </a>
+
+        <div class="list-empty" data-workspace="personal" hidden>
+          <div class="list-empty-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="list-empty-line1">No persons in this workspace yet</div>
+          <div class="list-empty-line2">Personal doesn't have contact records — those live in Kredi and HandyPass.</div>
+        </div>
+
+        <div class="list-empty" data-filter-empty hidden>
+          <div class="list-empty-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+          <div class="list-empty-line1">No persons match your filters</div>
+          <div class="list-empty-line2">Try a different search, or clear the filters below.</div>
+          <button type="button" class="list-empty-reset" data-filter-reset>Clear filters</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="new-person-overlay" hidden onclick="if(event.target===this)this.hidden=true">
+    <div class="create-dialog">
+      <h2 class="create-dialog-title">New person</h2>
+      <div class="create-fields">
+        <div class="create-field"><label>Name</label><input type="text" value="Diego Fuentes"></div>
+        <div class="create-field"><label>Company</label><select><option>Kredi</option><option>Bancora</option><option selected>Altiva</option><option>HandyPass</option><option>Stripe</option></select></div>
+        <div class="create-field"><label>Relationship</label><select><option>Employee</option><option selected>Partner</option></select></div>
+        <div class="create-field"><label>Title</label><input type="text" value="Integration engineer"></div>
+      </div>
+      <div class="create-dialog-actions">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('new-person-overlay').hidden=true">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('new-person-overlay').hidden=true;showToast('Person created')">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

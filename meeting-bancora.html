@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Bancora sync — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="assets/meetings.css">
+<style>
+  /* Transcript slide-over — layers onto the shared .drawer (480px, R1-D5).
+     .drawer sets display:flex unconditionally, so [hidden] needs an explicit override here. */
+  #transcript-overlay[hidden] { display: none; }
+  .transcript-head { display: flex; align-items: flex-start; justify-content: space-between; }
+  .transcript-sub { font: 400 13px/1.4 var(--font-sans); color: var(--muted-foreground); margin-top: 2px; }
+  .transcript-body { display: flex; flex-direction: column; gap: 16px; }
+  .transcript-turn { font: 400 13px/1.5 var(--font-sans); color: var(--foreground); }
+  .transcript-turn .ts { font: 500 10px/1 var(--font-mono); color: var(--muted-foreground); margin-right: 8px; }
+  .transcript-turn .speaker { font-weight: 600; }
+  .ask-input-row .ask-input { flex: 1; border: none; outline: none; background: none; font: 400 13px/1.3 var(--font-sans); color: var(--foreground); min-width: 0; }
+  .ask-input-row .ask-input::placeholder { color: var(--muted-foreground); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item active" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="main">
+    <div class="page-wrap">
+      <div class="crumb">
+        <a href="meetings.html">Meetings</a>
+        <span>/</span>
+        <span class="cur">Bancora sync</span>
+      </div>
+
+      <div class="detail-header">
+        <div class="detail-title-col">
+          <h1 class="t-page-title">Bancora sync</h1>
+          <div class="meta-line">Jul 6, 2026 · 45 min · Javier Aldape, Marco Del Toro (Bancora), Ana Reyes (Bancora)</div>
+        </div>
+        <a class="btn btn-primary" href="#" data-toast="Share link copied">Share</a>
+      </div>
+
+      <div class="main-row">
+        <div class="left-col">
+          <div class="recording-thumb">
+            <div class="play-btn" data-toast="Not in this prototype yet" style="cursor:pointer;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="duration">45:00</div>
+          </div>
+
+          <div class="meeting-actions">
+            <div class="t-section">Needs your approval · 1</div>
+            <div class="approval-row">
+              <div class="approval-left">
+                <span class="t-row-title">Knowledge edit — Bancora Account Overview</span>
+                <span class="approval-sub">Update with the new 'Proposal in progress' status and a summary of this meeting</span>
+              </div>
+              <div class="approval-actions" id="overview-approval-actions">
+                <a class="btn btn-sm btn-iris" href="#" onclick="event.preventDefault();approveEdit(this)">Approve</a>
+                <a class="btn btn-sm btn-iris-outline" href="knowledge-review.html?id=k-bancora-overview">Edit</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="capture-strip">
+            <div class="capture-header"><strong>Captured:</strong> 2 people · 1 project update · 3 tasks</div>
+            <div class="capture-divider"></div>
+            <div class="capture-rows">
+              <a class="capture-row" href="persons-selected.html?id=marco">
+                <div class="capture-row-content">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span class="capture-row-text"><strong>Marco Del Toro</strong> — new contact</span>
+                </div>
+                <svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+              <a class="capture-row" href="persons-selected.html?id=ana">
+                <div class="capture-row-content">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span class="capture-row-text"><strong>Ana Reyes</strong> — new contact</span>
+                </div>
+                <svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+              <div class="capture-row-spacer"></div>
+              <a class="capture-row" href="project-bancora.html">
+                <div class="capture-row-content">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                  <span class="capture-row-text"><strong>Bancora Integration</strong> — status → proposal in progress</span>
+                </div>
+                <svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+              <div class="capture-row-spacer"></div>
+              <a class="capture-row" href="tasks-detail.html?id=t1">
+                <div class="capture-row-content">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <span class="capture-row-text"><strong>Send Bancora integration proposal</strong> — task updated</span>
+                </div>
+                <svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+              <a class="capture-row" href="tasks-detail.html?id=t5">
+                <div class="capture-row-content">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <span class="capture-row-text"><strong>Loop in legal team on redlines</strong> — task created</span>
+                </div>
+                <svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+              <a class="capture-row" href="tasks-detail.html?id=t6">
+                <div class="capture-row-content">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <span class="capture-row-text"><strong>Follow up on redlines review</strong> — task created</span>
+                </div>
+                <svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="attendees-section">
+            <div class="t-section">Attendees</div>
+            <div class="people-row">
+              <div class="avatar-stack lg">
+                <div class="avatar" title="Javier Aldape">JA</div>
+                <div class="avatar" title="Marco Del Toro">MD</div>
+                <div class="avatar" title="Ana Reyes">AR</div>
+              </div>
+              <a class="view-all" href="#" data-toast="All 3 attendees shown">View all (3)</a>
+            </div>
+          </div>
+
+          <div class="highlights-card">
+            <div class="t-section">Highlights</div>
+            <div class="highlights-bullets">
+              <div class="highlight-item">
+                <div class="highlight-dot"></div>
+                <div class="highlight-text">Bancora wants the integration moving this quarter</div>
+              </div>
+              <div class="highlight-item">
+                <div class="highlight-dot"></div>
+                <div class="highlight-text">Proposal due to Marco by Friday, Jul 10</div>
+              </div>
+              <div class="highlight-item">
+                <div class="highlight-dot"></div>
+                <div class="highlight-text">Risk: legal flagged clauses in the data-sharing redline</div>
+              </div>
+              <div class="highlight-item">
+                <div class="highlight-dot"></div>
+                <div class="highlight-text">Their ask: loop Kredi legal in directly, skip the email back-and-forth</div>
+              </div>
+            </div>
+            <a class="btn btn-secondary" href="#" style="width:100%;" onclick="event.preventDefault();document.getElementById('transcript-overlay').hidden=false;document.getElementById('transcript-scrim').hidden=false">View full transcript</a>
+          </div>
+
+          <div class="ask-panel">
+            <div class="ask-thread">
+              <div class="ask-user-msg"><div class="ask-bubble">What did we promise Bancora?</div></div>
+              <div class="ask-answer">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.937A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L13.5 8.5a2 2 0 0 0 1.437 1.437l6.135 1.581a.5.5 0 0 1 0 .964L14.937 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                <div class="ask-answer-text">
+                  <p>Three commitments: send the integration proposal to Marco by Friday, Jul 10; loop Kredi legal into the redlines directly; and follow up once they've reviewed. All three are tracked as tasks.</p>
+                  <span class="ask-answer-source">From this meeting's transcript</span>
+                </div>
+              </div>
+              <div class="ask-user-msg"><div class="ask-bubble">Did we agree on a signing date?</div></div>
+              <div class="ask-answer">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.937A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L13.5 8.5a2 2 0 0 0 1.437 1.437l6.135 1.581a.5.5 0 0 1 0 .964L14.937 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+                <div class="ask-answer-text">
+                  <p>Not a date — Marco wants a signed agreement before end of month if the proposal lands this week.</p>
+                  <span class="ask-answer-source">From this meeting's transcript</span>
+                </div>
+              </div>
+            </div>
+            <div class="ask-divider"></div>
+            <div class="ask-input-row">
+              <svg class="sparkle" viewBox="0 0 24 24" fill="currentColor"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.937A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L13.5 8.5a2 2 0 0 0 1.437 1.437l6.135 1.581a.5.5 0 0 1 0 .964L14.937 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+              <input class="ask-input" placeholder="Ask a follow-up…" onkeydown="if(event.key==='Enter')askSend()">
+              <button class="ask-send-btn" onclick="askSend()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="drawer-scrim" href="#" id="transcript-scrim" hidden onclick="event.preventDefault();document.getElementById('transcript-overlay').hidden=true;this.hidden=true"></a>
+  <div class="drawer" id="transcript-overlay" hidden>
+    <div class="transcript-head">
+      <div>
+        <h2 class="drawer-title">Transcript</h2>
+        <div class="transcript-sub">Bancora sync · Jul 6, 2026 · 45 min</div>
+      </div>
+      <button class="icon-btn" aria-label="Close" onclick="document.getElementById('transcript-overlay').hidden=true;document.getElementById('transcript-scrim').hidden=true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="transcript-body">
+        <div class="transcript-turn"><span class="ts">00:00</span><span class="speaker">Marco Del Toro:</span> Thanks for making time, Javier. We want to move the integration forward this quarter — where are we on the technical proposal?</div>
+        <div class="transcript-turn"><span class="ts">00:26</span><span class="speaker">Javier Aldape:</span> We're close. I can have a formal proposal doc over to you both by end of week.</div>
+        <div class="transcript-turn"><span class="ts">01:05</span><span class="speaker">Ana Reyes:</span> That works. One thing on our side — legal flagged a couple of clauses in the data-sharing redline. Can someone loop in your legal team directly so we're not going back and forth through email?</div>
+        <div class="transcript-turn"><span class="ts">01:48</span><span class="speaker">Javier Aldape:</span> Yeah, I'll get our legal team looped in today, and I'll make sure we follow up once they've reviewed the redlines.</div>
+        <div class="transcript-turn"><span class="ts">02:20</span><span class="speaker">Marco Del Toro:</span> Perfect. If the proposal lands this week we could target a signed agreement before end of month.</div>
+        <div class="transcript-turn"><span class="ts">02:41</span><span class="speaker">Javier Aldape:</span> Let's aim for that. I'll send the proposal and keep you posted on the redlines.</div>
+        <div class="transcript-turn"><span class="ts">03:10</span><span class="speaker">Ana Reyes:</span> On scope — are we still starting with the onboarding flow, or the full account opening?</div>
+        <div class="transcript-turn"><span class="ts">03:32</span><span class="speaker">Javier Aldape:</span> Onboarding first. The proposal lays out a phased rollout, so we start narrow and expand once it's stable.</div>
+        <div class="transcript-turn"><span class="ts">04:05</span><span class="speaker">Marco Del Toro:</span> Phased works for us. Who owns the technical side on your end day to day?</div>
+        <div class="transcript-turn"><span class="ts">04:22</span><span class="speaker">Javier Aldape:</span> Our integrations team — I'll put the lead's contact in the proposal so your people can talk to them directly.</div>
+        <div class="transcript-turn"><span class="ts">05:01</span><span class="speaker">Ana Reyes:</span> And on the redlines, the two clauses are about data retention and the audit trail. Nothing unusual, but our legal wants them tightened.</div>
+        <div class="transcript-turn"><span class="ts">05:30</span><span class="speaker">Javier Aldape:</span> Understood. I'll flag both to our counsel so the review starts from the right place.</div>
+        <div class="transcript-turn"><span class="ts">06:02</span><span class="speaker">Marco Del Toro:</span> Anything you need from us to hit Friday?</div>
+        <div class="transcript-turn"><span class="ts">06:11</span><span class="speaker">Javier Aldape:</span> Just confirmation of the sandbox access — the rest is on us.</div>
+        <div class="transcript-turn"><span class="ts">06:40</span><span class="speaker">Marco Del Toro:</span> Done, I'll have that to you tomorrow. Good session — talk Friday.</div>
+    </div>
+  </div>
+</div>
+<script src="assets/records.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// ponytail: canned prototype interactions — no real backend
+function approveEdit(btn) {
+  NysaState.setApproval('k-bancora-overview', 'approved');
+  var row = btn.closest('.approval-row');
+  row.querySelector('.approval-actions').innerHTML = '<span class="pill pill-green">Approved</span>';
+  document.querySelector('.meeting-actions .t-section').textContent = 'Needs your approval · 0';
+  showToast('Approved — Knowledge page updated');
+}
+document.addEventListener('DOMContentLoaded', function () {
+  if (NysaState.getApproval('k-bancora-overview') === 'approved') {
+    var actions = document.getElementById('overview-approval-actions');
+    if (actions) actions.innerHTML = '<span class="pill pill-green">Approved</span>';
+    var count = document.querySelector('.meeting-actions .t-section');
+    if (count) count.textContent = 'Needs your approval · 0';
+  }
+});
+function askSend() {
+  var input = document.querySelector('.ask-input');
+  var q = input.value.trim() || 'When do the redlines come back?';
+  var thread = document.querySelector('.ask-thread');
+  var u = document.createElement('div');
+  u.className = 'ask-user-msg';
+  u.innerHTML = '<div class="ask-bubble"></div>';
+  u.firstChild.textContent = q;
+  var a = document.createElement('div');
+  a.className = 'ask-answer';
+  a.innerHTML = document.querySelector('.ask-answer').querySelector('svg').outerHTML +
+    '<div class="ask-answer-text"><p>No date was set — Ana asked us to loop Kredi legal in directly, and Javier committed to follow up once they’ve reviewed. Both follow-ups are tracked as tasks.</p><span class="ask-answer-source">From this meeting’s transcript</span></div>';
+  thread.appendChild(u);
+  thread.appendChild(a);
+  input.value = '';
+  a.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>

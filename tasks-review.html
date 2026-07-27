@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Review approvals — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="assets/tasks.css">
+<style>
+/* Document-first stage — chosen Jul 13 as the real approval reviewer.
+   Keeps the D21B stepper logic (per-item approve/skip/ask-for-changes,
+   progress, keyboard nav, receipt) and the D40 risk-first ordering
+   (external-send items surfaced before internal ones); only the
+   presentation layer here replaces the earlier card-based treatment.
+   All rules are scoped with a "b-" prefix so nothing leaks onto /
+   collides with other pages' classes. */
+
+* { box-sizing: border-box; }
+
+.b-body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--muted);
+  font-family: var(--font-sans);
+  color: var(--foreground);
+}
+
+.b-stagewrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 20px 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Top strip: exit + dots */
+.b-topbar {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+.b-exit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 13px/1 var(--font-sans);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  border-radius: var(--r-control);
+  padding: 4px 6px;
+  margin: -4px -6px;
+}
+.b-exit svg { width: 15px; height: 15px; }
+.b-exit:hover, .b-exit:focus-visible { color: var(--foreground); background: rgba(0,0,0,.04); }
+.b-exit:focus-visible { outline: 2px solid var(--foreground); outline-offset: 1px; }
+
+.b-dots { display: flex; align-items: center; gap: 12px; }
+.b-dotrow { display: flex; align-items: center; gap: 6px; }
+.b-dot {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: var(--border);
+  transition: background .15s ease, transform .15s ease;
+}
+.b-dot.is-done { background: var(--foreground); }
+.b-dot.is-current { background: var(--foreground); transform: scale(1.3); }
+.b-dotlabel { font: 500 12px/1 var(--font-sans); color: var(--muted-foreground); white-space: nowrap; }
+
+/* Slim strip above the sheet: risk tag + provenance */
+.b-strip {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+  min-height: 20px;
+}
+.b-strip-note {
+  font: 400 12px/1.4 var(--font-sans);
+  color: var(--muted-foreground);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* The hero sheet */
+.b-sheet {
+  width: 100%;
+  max-width: 680px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+  padding: 36px 40px;
+  position: relative;
+  transition: box-shadow .2s ease;
+}
+.b-sheet.is-stamped { box-shadow: 0 0 0 3px var(--green-3), 0 8px 30px rgba(0,0,0,.07); }
+
+.b-sheet-stamp {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--green-3);
+  color: var(--green-11);
+  font: 600 12px/1 var(--font-sans);
+  opacity: 0;
+  transform: translateY(-4px) scale(.96);
+  transition: opacity .18s ease, transform .18s ease;
+  pointer-events: none;
+}
+.b-sheet-stamp.is-visible { opacity: 1; transform: translateY(0) scale(1); }
+.b-sheet-stamp svg { width: 13px; height: 13px; }
+
+.b-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.b-sheet-title {
+  font: 600 21px/1.3 var(--font-sans);
+  color: var(--foreground);
+  margin: 6px 0 4px;
+}
+.b-sheet-note {
+  font: 400 14px/1.55 var(--font-sans);
+  color: var(--muted-foreground);
+  margin: 0 0 20px;
+}
+.b-sheet-destination {
+  font: 500 13px/1.5 var(--font-sans);
+  color: var(--foreground);
+  margin: -6px 0 20px;
+}
+.b-sheet-statusrow { margin: -6px 0 18px; display: flex; gap: 8px; }
+
+.b-kv-link {
+  display: inline-block;
+  margin-top: 16px;
+  font: 500 13px/1.4 var(--font-sans);
+  color: var(--iris-11);
+  text-decoration: none;
+}
+.b-kv-link:hover { text-decoration: underline; }
+
+/* ---------- Email as a real letter ---------- */
+.b-letter { border-top: 1px solid var(--border); padding-top: 20px; }
+.b-letter-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.b-avatar {
+  width: 34px; height: 34px; border-radius: 999px;
+  background: var(--foreground); color: #fff;
+  font: 600 13px/1 var(--font-sans);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.b-letter-meta { flex: 1; min-width: 0; }
+.b-letter-row { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); }
+.b-letter-row .b-name { color: var(--foreground); font-weight: 500; }
+.b-letter-subject { font: 600 17px/1.35 var(--font-sans); color: var(--foreground); margin: 0 0 18px; }
+.b-letter-body p { font: 400 15px/1.7 var(--font-sans); color: var(--foreground); margin: 0 0 14px; }
+.b-letter-body p:last-child { margin-bottom: 0; }
+.b-letter-attachment {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 20px; padding: 12px 14px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--muted);
+}
+.b-letter-attachment svg { width: 18px; height: 18px; color: var(--muted-foreground); flex-shrink: 0; }
+.b-letter-attachment-name { font: 500 13px/1.4 var(--font-sans); color: var(--foreground); }
+.b-letter-attachment-meta { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); }
+.b-letter-attachment-link { margin-left: auto; font: 500 13px/1 var(--font-sans); color: var(--iris-11); text-decoration: none; }
+.b-letter-attachment-link:hover { text-decoration: underline; }
+
+/* ---------- Agenda as paper document ---------- */
+.b-paper {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+.b-paper-sheet {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.b-paper-title {
+  font: 600 15px/1.3 var(--font-sans);
+  color: var(--foreground);
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.b-paper-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: 8px;
+  font: 400 13.5px/1.5 var(--font-sans);
+}
+.b-paper-item + .b-paper-item { margin-top: 2px; }
+.b-paper-item.is-changed { background: var(--iris-3); }
+.b-paper-n { color: var(--muted-foreground); width: 18px; flex-shrink: 0; text-align: right; }
+.b-paper-text { color: var(--foreground); flex: 1; }
+.b-paper-meta { color: var(--muted-foreground); white-space: nowrap; font-size: 12.5px; }
+.b-paper-tag {
+  font: 500 10px/1 var(--font-sans); text-transform: uppercase; letter-spacing: .03em;
+  padding: 2px 6px; border-radius: 999px; background: var(--foreground); color: #fff; margin-left: 6px;
+}
+
+/* ---------- Knowledge diff as record card ---------- */
+.b-record { border-top: 1px solid var(--border); padding-top: 20px; }
+.b-record-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.b-record-row:last-child { border-bottom: none; padding-bottom: 0; }
+.b-record-field {
+  font: 500 11px/1.4 var(--font-sans); text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted-foreground); margin: 0 0 8px; display: flex; align-items: center; gap: 6px;
+}
+.b-record-before {
+  display: inline-block; font: 400 13.5px/1.5 var(--font-sans);
+  color: var(--red-9); background: var(--red-3); text-decoration: line-through;
+  padding: 3px 7px; border-radius: 6px; margin-bottom: 5px;
+}
+.b-record-after {
+  display: block; font: 400 13.5px/1.6 var(--font-sans);
+  color: var(--green-11); background: var(--green-3);
+  padding: 6px 9px; border-radius: 8px;
+}
+.b-record-tag {
+  font: 500 10px/1 var(--font-sans); text-transform: uppercase; letter-spacing: .03em;
+  padding: 2px 6px; border-radius: 999px; background: var(--foreground); color: #fff;
+}
+.b-record-source { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 14px 0 0; }
+.b-record-source a { color: var(--iris-11); text-decoration: none; }
+.b-record-source a:hover { text-decoration: underline; }
+
+/* ---------- Knowledge merge: notes -> article ---------- */
+.b-merge { border-top: 1px solid var(--border); padding-top: 20px; }
+.b-merge-label {
+  font: 500 11px/1.4 var(--font-sans); text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted-foreground); margin: 0 0 10px;
+}
+.b-merge-notes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
+.b-merge-note {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--muted); font: 400 13px/1.4 var(--font-sans);
+}
+.b-merge-note-title { color: var(--foreground); font-weight: 500; }
+.b-merge-note-date { color: var(--muted-foreground); white-space: nowrap; font-size: 12px; }
+.b-merge-arrow {
+  display: flex; justify-content: center; margin: 6px 0 10px; color: var(--muted-foreground);
+}
+.b-merge-arrow svg { width: 16px; height: 16px; }
+.b-merge-article {
+  border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+}
+.b-merge-article-title { font: 600 15px/1.35 var(--font-sans); color: var(--foreground); margin: 0 0 8px; }
+.b-merge-article-body { font: 400 13.5px/1.6 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+
+/* ---------- Ask-for-changes expander ---------- */
+.b-editwrap {
+  width: 100%; max-width: 680px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .18s ease;
+}
+.b-editwrap.open { max-height: 100px; }
+.b-editrow {
+  display: flex; gap: 8px;
+  margin: 12px 0 0;
+}
+.b-editrow .input { flex: 1; }
+
+/* ---------- Action bar ---------- */
+.b-actionbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: center;
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, rgba(244,244,242,0) 0%, var(--muted) 40%);
+  pointer-events: none;
+}
+.b-actionbar-inner {
+  pointer-events: auto;
+  width: 100%; max-width: 680px;
+  display: flex; align-items: center; gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+.b-actionbar-back { margin-right: auto; }
+.b-actionbar-spacer { margin-right: auto; }
+
+/* ---------- Receipt ---------- */
+.b-receipt {
+  max-width: 420px;
+  margin: 90px auto 0;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+}
+.b-receipt-icon {
+  width: 44px; height: 44px; color: var(--green-11); background: var(--green-3);
+  border-radius: 50%; padding: 11px; box-sizing: border-box;
+}
+.b-receipt-title { font: 600 21px/1.3 var(--font-sans); margin: 10px 0 0; color: var(--foreground); }
+.b-receipt-body { font: 400 14px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 0 0 14px; }
+
+@media (max-width: 560px) {
+  .b-sheet { padding: 26px 22px; }
+  .b-topbar, .b-strip { max-width: none; }
+}
+</style>
+</head>
+<body class="b-body">
+
+<div class="b-stagewrap">
+
+  <div class="b-topbar">
+    <a class="b-exit" href="tasks.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      Exit review
+    </a>
+    <div class="b-dots" id="b-progress-wrap">
+      <div class="b-dotrow" id="b-dotrow"></div>
+      <span class="b-dotlabel" id="b-dotlabel">1 of 4</span>
+    </div>
+  </div>
+
+  <div class="b-strip" id="b-strip"></div>
+
+  <div id="b-stage"></div>
+
+  <div class="b-editwrap" id="b-editwrap">
+    <div class="b-editrow">
+      <input class="input" id="b-edit-input" type="text" placeholder="Tell the assistant what to change…" onkeydown="if(event.key==='Enter')sendEditRequest()">
+      <button class="btn btn-primary" onclick="sendEditRequest()">Send</button>
+    </div>
+  </div>
+
+  <div class="b-receipt" id="b-receipt" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="b-receipt-icon"><path d="M20 6 9 17l-5-5"/></svg>
+    <h2 class="b-receipt-title">Review complete</h2>
+    <p class="b-receipt-body" id="b-receipt-body">You approved 0 and skipped 0.</p>
+    <a class="btn btn-primary" href="tasks.html">Back to My board</a>
+  </div>
+
+</div>
+
+<div class="b-actionbar" id="b-actionbar">
+  <div class="b-actionbar-inner">
+    <button type="button" class="btn btn-ghost b-actionbar-back" id="b-back-btn" onclick="prevItem()">← Back</button>
+    <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Ask for changes</button>
+    <button type="button" class="btn btn-secondary" onclick="skipItem()">Skip</button>
+    <button type="button" class="btn btn-iris" onclick="approveItem()">Approve</button>
+  </div>
+</div>
+
+<script src="assets/records.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// Document-first stage — chosen Jul 13 as the real approval reviewer.
+// Retains the D21B stepper logic (ITEMS order, approve / skip /
+// ask-for-changes actions, NysaState approvals/revisions, back/forward
+// navigation, keyboard shortcuts, receipt, exit) and the D40 risk-first
+// ordering (the one external send is pinned to the front; sort is
+// stable/generic, not a hardcoded reorder of this one array).
+var ITEMS = ['t1', 't9', 'k-bancora-overview', 'workaround-notes'].slice().sort(function (a, b) {
+  var aExt = window.NYSA.TASKS[a].sendsExternally ? 0 : 1;
+  var bExt = window.NYSA.TASKS[b].sendsExternally ? 0 : 1;
+  return aExt - bExt;
+});
+var idx = 0;
+var results = {}; // id -> 'approved' | 'skipped' | 'changes-requested'
+
+function itemNote(task) {
+  return task.note || 'Ready for your review.';
+}
+
+function initials(name) {
+  return name.split(' ').map(function (p) { return p[0]; }).join('').slice(0, 2).toUpperCase();
+}
+
+function renderReviewContent(task) {
+  var r = task.review;
+  if (!r) return '';
+  if (r.type === 'email') return renderEmailReview(r);
+  if (r.type === 'document') return renderDocumentReview(r);
+  if (r.type === 'knowledge-diff') return renderDiffReview(r);
+  if (r.type === 'knowledge-merge') return renderMergeReview(r);
+  return '';
+}
+
+function renderEmailReview(r) {
+  var toInitials = r.to.initials || initials(r.to.name);
+  return '<div class="b-letter">' +
+    '<div class="b-letter-head">' +
+      '<span class="b-avatar">' + toInitials + '</span>' +
+      '<div class="b-letter-meta">' +
+        '<div class="b-letter-row">To <span class="b-name">' + r.to.name + '</span> (' + r.to.company + ')</div>' +
+        (r.cc ? '<div class="b-letter-row">Cc <span class="b-name">' + r.cc.name + '</span> (' + r.cc.company + ')</div>' : '') +
+      '</div>' +
+    '</div>' +
+    '<p class="b-letter-subject">' + r.subject + '</p>' +
+    '<div class="b-letter-body">' +
+      r.body.map(function (p) { return '<p>' + p + '</p>'; }).join('') +
+    '</div>' +
+    (r.attachment ? '<div class="b-letter-attachment">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>' +
+      '<div><div class="b-letter-attachment-name">' + r.attachment.name + '</div><div class="b-letter-attachment-meta">' + r.attachment.pages + ' pages</div></div>' +
+      '<a class="b-letter-attachment-link" href="#" data-toast="Not in this prototype yet">View</a>' +
+    '</div>' : '') +
+  '</div>';
+}
+
+function renderDocumentReview(r) {
+  var items = r.items.map(function (it) {
+    var tag = it.tag ? '<span class="b-paper-tag">' + it.tag + '</span>' : '';
+    return '<div class="b-paper-item' + (it.tag ? ' is-changed' : '') + '">' +
+      '<span class="b-paper-n">' + it.n + '.</span>' +
+      '<span class="b-paper-text">' + it.text + tag + '</span>' +
+      '<span class="b-paper-meta">' + it.owner + ' · ' + it.timing + '</span>' +
+    '</div>';
+  }).join('');
+  return '<div class="b-paper">' +
+    '<div class="b-paper-sheet">' +
+      '<p class="b-paper-title">' + r.title + '</p>' +
+      items +
+    '</div>' +
+    (r.openHref ? '<a class="b-kv-link" href="' + r.openHref + '" data-toast="Not in this prototype yet">Open full document</a>' : '') +
+  '</div>';
+}
+
+function renderDiffReview(r) {
+  var rows = r.changes.map(function (c) {
+    var tag = c.tag ? '<span class="b-record-tag">' + c.tag + '</span>' : '';
+    return '<div class="b-record-row">' +
+      '<p class="b-record-field">' + c.field + tag + '</p>' +
+      (c.before ? '<span class="b-record-before">' + c.before + '</span>' : '') +
+      '<span class="b-record-after">' + c.after + '</span>' +
+    '</div>';
+  }).join('');
+  return '<div class="b-record">' +
+    rows +
+    (r.source ? '<p class="b-record-source">Source: ' +
+      (r.source.href ? '<a href="' + r.source.href + '" target="_blank" rel="noopener">' + r.source.text + '</a>' : r.source.text) +
+    '</p>' : '') +
+  '</div>';
+}
+
+function renderMergeReview(r) {
+  var notes = r.notes.map(function (n) {
+    return '<div class="b-merge-note">' +
+      '<span class="b-merge-note-title">' + n.title + '</span>' +
+      '<span class="b-merge-note-date">' + n.date + '</span>' +
+    '</div>';
+  }).join('');
+  return '<div class="b-merge">' +
+    '<p class="b-merge-label">Source notes</p>' +
+    '<div class="b-merge-notes">' + notes + '</div>' +
+    '<div class="b-merge-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></div>' +
+    '<div class="b-merge-article">' +
+      '<p class="b-merge-label">Resulting article</p>' +
+      '<p class="b-merge-article-title">' + r.articleTitle + '</p>' +
+      '<p class="b-merge-article-body">' + r.articlePreview + '</p>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderDots() {
+  var row = document.getElementById('b-dotrow');
+  var html = '';
+  for (var i = 0; i < ITEMS.length; i++) {
+    var id = ITEMS[i];
+    var handled = results[id] || (NysaState.getApproval(id) === 'approved' ? 'approved' : null);
+    var cls = 'b-dot';
+    if (i === idx) cls += ' is-current';
+    else if (handled) cls += ' is-done';
+    html += '<span class="' + cls + '"></span>';
+  }
+  row.innerHTML = html;
+  document.getElementById('b-dotlabel').textContent = (idx + 1) + ' of ' + ITEMS.length;
+}
+
+function render() {
+  if (idx >= ITEMS.length) return showReceipt();
+  var id = ITEMS[idx];
+  var task = window.NYSA.TASKS[id];
+  var already = NysaState.getApproval(id) === 'approved';
+  var revisionPending = !already && NysaState.getRevision(id);
+
+  renderDots();
+
+  var tag = task.sendsExternally
+    ? '<span class="pill pill-red">Sends externally</span>'
+    : '<span class="pill pill-gray">Internal change</span>';
+  var provenance = (task.review && task.review.provenance) ? task.review.provenance : '';
+  document.getElementById('b-strip').innerHTML =
+    tag +
+    '<span class="chip chip-project">' + task.project + '</span>' +
+    '<span class="chip chip-ws-gray">' + task.workspace + '</span>' +
+    (provenance ? '<span class="b-strip-note">' + provenance + '</span>' : '');
+
+  var stage = document.getElementById('b-stage');
+  stage.innerHTML =
+    '<div class="b-sheet" id="b-sheet">' +
+      '<div class="b-sheet-stamp" id="b-sheet-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Approved</div>' +
+      '<h2 class="b-sheet-title">' + task.title + '</h2>' +
+      '<p class="b-sheet-note">' + itemNote(task) + '</p>' +
+      renderReviewContent(task) +
+      (task.destination ? '<p class="b-sheet-destination">→ ' + task.destination + '</p>' : '') +
+      (task.knowledgeHref ? '<a class="b-kv-link" href="' + task.knowledgeHref + '" target="_blank" rel="noopener">view Knowledge draft</a>' : '') +
+      (already ? '<div class="b-sheet-statusrow"><span class="pill pill-green">Already approved</span></div>' : '') +
+      (revisionPending ? '<div class="b-sheet-statusrow"><span class="revision-tag">Revision requested</span></div>' : '') +
+    '</div>';
+
+  document.getElementById('b-back-btn').style.visibility = idx > 0 ? 'visible' : 'hidden';
+  document.getElementById('b-editwrap').classList.remove('open');
+}
+
+function toggleEdit() {
+  var wrap = document.getElementById('b-editwrap');
+  wrap.classList.toggle('open');
+  if (wrap.classList.contains('open')) document.getElementById('b-edit-input').focus();
+}
+
+function sendEditRequest() {
+  var id = ITEMS[idx];
+  results[id] = 'changes-requested';
+  NysaState.setRevision(id, true);
+  showToast('Change request sent to the assistant');
+  document.getElementById('b-editwrap').classList.remove('open');
+  document.getElementById('b-edit-input').value = '';
+  next();
+}
+
+function approveItem() {
+  var id = ITEMS[idx];
+  NysaState.setApproval(id, 'approved');
+  results[id] = 'approved';
+  showToast('Approved');
+  var sheet = document.getElementById('b-sheet');
+  var stamp = document.getElementById('b-sheet-stamp');
+  if (sheet && stamp) {
+    sheet.classList.add('is-stamped');
+    stamp.classList.add('is-visible');
+    setTimeout(next, 420);
+  } else {
+    next();
+  }
+}
+
+function skipItem() {
+  results[ITEMS[idx]] = 'skipped';
+  next();
+}
+
+function next() {
+  idx++;
+  render();
+}
+
+function prevItem() {
+  if (idx === 0) return;
+  idx--;
+  render();
+}
+
+function showReceipt() {
+  document.getElementById('b-stage').hidden = true;
+  document.getElementById('b-strip').hidden = true;
+  document.getElementById('b-progress-wrap').hidden = true;
+  document.getElementById('b-editwrap').hidden = true;
+  document.getElementById('b-actionbar').hidden = true;
+  var approved = 0, skipped = 0, changes = 0;
+  Object.keys(results).forEach(function (id) {
+    if (results[id] === 'approved') approved++;
+    else if (results[id] === 'changes-requested') changes++;
+    else skipped++;
+  });
+  var parts = ['approved ' + approved];
+  if (changes) parts.push('sent ' + changes + ' back for changes');
+  if (skipped) parts.push('skipped ' + skipped);
+  document.getElementById('b-receipt-body').textContent = 'You ' + parts.join(', ') + '. Skipped items stay in Needs you.';
+  document.getElementById('b-receipt').hidden = false;
+}
+
+document.addEventListener('keydown', function (e) {
+  if (document.activeElement && document.activeElement.id === 'b-edit-input') return;
+  if (idx >= ITEMS.length) return;
+  if (e.key === 'Enter') { e.preventDefault(); approveItem(); }
+  if (e.key === 's' || e.key === 'S') skipItem();
+  if (e.key === 'ArrowLeft') prevItem();
+  if (e.key === 'ArrowRight') skipItem();
+});
+
+render();
+</script>
+</body>
+</html>

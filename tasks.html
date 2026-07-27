@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Tasks — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="assets/tasks.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item active" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="main">
+    <div class="page-wrap">
+
+      <div class="page-head">
+        <h1 class="t-page-title">Tasks</h1>
+        <!-- Manual task creation goes through chat (spec §4.1 "chat is a command
+             line" / §4.5 chat as a task source) — Javier's direct call Jul 13;
+             replaced the old form modal. -->
+        <a class="btn btn-secondary" href="chat.html?intent=new-task">New task</a>
+      </div>
+
+      <div class="toolbar">
+        <div class="row-menu">
+          <button type="button" class="btn btn-secondary tasks-filter-btn" data-menu>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Filter
+          </button>
+          <div class="menu-popover" style="right:auto;left:0">
+            <div class="menu-item" data-toast="Sorted by due date">Sort by due date</div>
+            <div class="menu-item" data-toast="Sorted by project">Sort by project</div>
+            <div class="menu-separator"></div>
+            <div class="menu-item" data-toast="Showing Kredi workspace only">Only Kredi workspace</div>
+            <div class="menu-item" data-toast="Done tasks hidden">Hide done</div>
+            <div class="menu-separator"></div>
+            <div class="menu-item" onclick="resetDemoData(event)">Reset demo data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- One-time onboarding readiness receipt (Decision 32 step 8). Neutral,
+           dismissible once; reads and clears receiptPending from the onboarding
+           localStorage state. Outside the workspace wrapper so it shows for
+           every branch, including Personal-only users. -->
+      <div class="daily-brief" id="setup-receipt" hidden>
+        <div class="daily-brief-head">
+          <span class="daily-brief-title">Setup</span>
+          <button type="button" class="icon-btn" aria-label="Dismiss" onclick="dismissSetupReceipt()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <p class="daily-brief-body" id="setup-receipt-body"></p>
+      </div>
+
+      <div data-workspace="kredi">
+      <!-- Needs you — single summary card (Jul 13). The per-task cards moved
+           entirely into the tasks-review.html stepper; the board just says how
+           many are queued and hands off to the full-page review. -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span class="dash-card-title">Needs you</span>
+            <span class="dash-card-count" id="needs-you-count">4</span>
+          </div>
+        </div>
+        <div class="dash-card-content">
+          <a class="needs-you-link" id="needs-you-summary" href="tasks-review.html">
+            <div class="needs-you-body">
+              <div class="needs-you-text">
+                <span class="needs-you-title" id="needs-you-summary-title">4 tasks need your review or approval</span>
+                <span class="needs-you-sub" id="needs-you-summary-sub">One sends externally — the Bancora proposal. Go through them one at a time.</span>
+              </div>
+              <span class="btn btn-iris">Review all</span>
+            </div>
+          </a>
+          <!-- D48B — quiet cleared-summary line, shown once Needs-you reaches 0 -->
+          <a class="cleared-line" id="cleared-line" href="#done-group" onclick="revealDone(event)" hidden>
+            <span class="cleared-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </span>
+            <span>Cleared — 4 handled today · <span style="text-decoration:underline">receipts in Done</span></span>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="event.stopPropagation();resetDemoData(event)">Reset demo</button>
+          </a>
+        </div>
+      </div>
+
+      <!-- Assistant working — summary + on-demand detail (Jul 13). You don't
+           need to see every in-flight task; the summary says what's happening
+           and the rows expand only if you ask. -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span class="dash-card-title">Assistant working</span>
+            <span class="dash-card-count" id="assistant-working-count">3</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="assistant-working-rows" onclick="toggleDetails('assistant-working-rows', this)">View details</button>
+        </div>
+        <div class="dash-card-content">
+          <p class="needs-you-sub" id="assistant-summary-sub" style="margin:6px 0 10px">Rescheduling and prepping the Altiva demo, and setting up the Stripe account for HandyPass.</p>
+          <div class="dash-rows" id="assistant-working-rows" hidden>
+            <a class="dash-row" href="tasks-detail.html?id=t3">
+              <div class="dash-row-main">
+                <span class="dash-row-title">Reschedule demo with Altiva <span class="chip chip-project">Altiva</span></span>
+                <span class="dash-row-dim">Checking calendar availability with Altiva's team</span>
+              </div>
+            </a>
+            <a class="dash-row" href="tasks-detail.html?id=t7">
+              <div class="dash-row-main">
+                <span class="dash-row-title">Set up HandyPass Stripe account <span class="chip chip-project">HandyPass Launch</span><span class="chip chip-ws-amber">HandyPass</span></span>
+                <span class="dash-row-dim">Filling out the Stripe onboarding form</span>
+              </div>
+            </a>
+            <a class="dash-row" href="tasks-detail.html?id=t14">
+              <div class="dash-row-main">
+                <span class="dash-row-title">Prep talking points for Altiva demo <span class="chip chip-project">Altiva</span></span>
+                <span class="dash-row-dim">Pulling deal history and past objections</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Waiting on others — summary + on-demand detail (Jul 13). Expanded
+           rows keep the mark-complete and nudge actions. -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span class="dash-card-title">Waiting on others</span>
+            <span class="dash-card-count">2</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="waiting-rows" onclick="toggleDetails('waiting-rows', this)">View details</button>
+        </div>
+        <div class="dash-card-content">
+          <p class="needs-you-sub" style="margin:6px 0 10px">2 tasks are waiting on someone else. Legal has had the redlines since Jul 6, and the venue coordinator hasn't confirmed the offsite.</p>
+          <div class="dash-rows" id="waiting-rows" hidden>
+            <a class="dash-row" href="tasks-detail.html?id=t5">
+              <div class="dash-row-main">
+                <span class="dash-row-title">Loop in legal team on redlines <span class="chip chip-project">Bancora</span></span>
+                <span class="dash-row-dim">With legal since Jul 6</span>
+              </div>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="event.preventDefault();this.closest('.dash-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Nudge" data-toast="Nudging them for an update" onclick="event.preventDefault()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
+                </button>
+              </div>
+            </a>
+            <a class="dash-row" href="tasks-detail.html?id=t10">
+              <div class="dash-row-main">
+                <span class="dash-row-title">Confirm venue for Kredi offsite <span class="chip chip-project">Kredi Offsite</span></span>
+                <span class="dash-row-dim is-waiting">Venue coordinator, since Jul 5</span>
+              </div>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="event.preventDefault();this.closest('.dash-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Nudge" data-toast="Nudging them for an update" onclick="event.preventDefault()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
+                </button>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yours to do — checklist layout (Jul 13). Stays a full list since
+           these are the only items the assistant can't move without you.
+           Actions (mark complete / hand off) stay on the right per Javier. -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span class="dash-card-title">Yours to do</span>
+            <span class="dash-card-count">5</span>
+          </div>
+        </div>
+        <div class="dash-card-content">
+          <div class="todo-rows">
+            <div class="todo-row">
+              <a class="todo-main" href="tasks-detail.html?id=t2">
+                <span class="todo-title">Draft board update</span>
+                <span class="chip chip-project">Board Ops</span>
+              </a>
+              <span class="todo-context"></span>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="this.closest('.todo-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Hand off to assistant" data-toast="Handed off to assistant">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="todo-row">
+              <a class="todo-main" href="tasks-detail.html?id=t6">
+                <span class="todo-title">Follow up on redlines review</span>
+                <span class="chip chip-project">Bancora</span>
+              </a>
+              <span class="todo-context">From Bancora sync, Jul 6</span>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="this.closest('.todo-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Hand off to assistant" data-toast="Handed off to assistant">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="todo-row">
+              <a class="todo-main" href="tasks-detail.html?id=t8">
+                <span class="todo-title">Buy a gift for the Kredi offsite</span>
+              </a>
+              <span class="todo-context"></span>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="this.closest('.todo-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Hand off to assistant" data-toast="Handed off to assistant">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="todo-row">
+              <a class="todo-main" href="tasks-detail.html?id=t4">
+                <span class="todo-title">Renew passport</span>
+                <span class="chip chip-ws-gray">Personal</span>
+              </a>
+              <span class="todo-context"></span>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="this.closest('.todo-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Hand off to assistant" data-toast="Handed off to assistant">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="todo-row">
+              <a class="todo-main" href="tasks-detail.html?id=t12">
+                <span class="todo-title">Update HandyPass landing page copy</span>
+                <span class="chip chip-project">HandyPass Launch</span>
+                <span class="chip chip-ws-amber">HandyPass</span>
+              </a>
+              <span class="todo-context"></span>
+              <div class="row-actions">
+                <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="this.closest('.todo-row').classList.toggle('is-done')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="row-action-btn" title="Hand off to assistant" data-toast="Handed off to assistant">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Done — collapsed accordion (D48B — approved needs-you items land
+           here as receipt rows). Same View details / Hide details button
+           pattern as Assistant working and Waiting on others, for one
+           consistent expand mechanism across the board. -->
+      <div class="dash-card" id="done-group">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span class="dash-card-title">Done</span>
+            <span class="dash-card-count" id="done-count">2</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="done-rows" onclick="toggleDone()">View details</button>
+        </div>
+        <div class="dash-card-content" id="done-rows" hidden>
+          <!-- Base done rows (Jul 13) — the count always said 2, but these rows
+               were never in the DOM, so opening the accordion showed nothing. -->
+          <a class="done-row" href="tasks-detail.html?id=t11">
+            <span class="done-row-title">Send weekly Bancora status update</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              Sent
+            </span>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=t13">
+            <span class="done-row-title">Book flights for the Kredi offsite</span>
+            <span class="chip chip-project">Kredi Offsite</span>
+            <span class="pill pill-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              Done
+            </span>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=t1" data-done-row="t1" hidden>
+            <span class="done-row-title">Send Bancora integration proposal</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              Sent
+            </span>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=t9" data-done-row="t9" hidden>
+            <span class="done-row-title">Review July board agenda draft</span>
+            <span class="chip chip-project">Board Ops</span>
+            <span class="pill pill-green">Approved</span>
+            <button type="button" class="activity-undo" onclick="event.preventDefault();event.stopPropagation();undoQuickApproval('t9')">Undo</button>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=k-bancora-overview" data-done-row="k-bancora-overview" hidden>
+            <span class="done-row-title">Knowledge edit — Bancora Account Overview</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">Approved</span>
+            <button type="button" class="activity-undo" onclick="event.preventDefault();event.stopPropagation();undoQuickApproval('k-bancora-overview')">Undo</button>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=workaround-notes" data-done-row="workaround-notes" hidden>
+            <span class="done-row-title">Publish workaround notes to Knowledge</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">Approved</span>
+            <button type="button" class="activity-undo" onclick="event.preventDefault();event.stopPropagation();undoQuickApproval('workaround-notes')">Undo</button>
+          </a>
+        </div>
+      </div>
+      </div>
+      <!-- ===== Personal board (Decision 27A) ===== -->
+      <div data-workspace="personal" hidden>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Needs you</span>
+              <span class="dash-card-count">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Yours to do</span>
+              <span class="dash-card-count">2</span>
+            </div>
+          </div>
+          <div class="dash-card-content">
+            <div class="dash-rows">
+              <a class="dash-row" href="tasks-detail.html?id=t4">
+                <div class="dash-row-main"><span class="dash-row-title">Renew passport</span></div>
+                <div class="row-actions">
+                  <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="event.preventDefault();this.closest('.dash-row').classList.toggle('is-done')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </button>
+                </div>
+              </a>
+              <a class="dash-row" href="#" onclick="event.preventDefault()">
+                <div class="dash-row-main"><span class="dash-row-title">Pay HOA quarterly fees</span></div>
+                <div class="row-actions">
+                  <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="event.preventDefault();this.closest('.dash-row').classList.toggle('is-done')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </button>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Waiting on others</span>
+              <span class="dash-card-count">1</span>
+            </div>
+          </div>
+          <div class="dash-card-content">
+            <div class="dash-rows">
+              <a class="dash-row" href="#" onclick="event.preventDefault()">
+                <div class="dash-row-main">
+                  <span class="dash-row-title">Schedule annual physical</span>
+                  <span class="dash-row-dim">Waiting on clinic</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header" data-toast="Not in this prototype yet">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Done</span>
+              <span class="dash-card-count">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== HandyPass board (Decision 27A) ===== -->
+      <div data-workspace="handypass" hidden>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Needs you</span>
+              <span class="dash-card-count">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Assistant working</span>
+              <span class="dash-card-count">1</span>
+            </div>
+          </div>
+          <div class="dash-card-content">
+            <div class="dash-rows">
+              <a class="dash-row" href="tasks-detail.html?id=t7">
+                <div class="dash-row-main">
+                  <span class="dash-row-title">Set up HandyPass Stripe account <span class="chip chip-project">HandyPass Launch</span></span>
+                  <span class="dash-row-dim">Filling out the Stripe onboarding form</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-title-group">
+              <span class="dash-card-title">Yours to do</span>
+              <span class="dash-card-count">1</span>
+            </div>
+          </div>
+          <div class="dash-card-content">
+            <div class="dash-rows">
+              <a class="dash-row" href="tasks-detail.html?id=t12">
+                <div class="dash-row-main"><span class="dash-row-title">Update HandyPass landing page copy <span class="chip chip-project">HandyPass Launch</span></span></div>
+                <div class="row-actions">
+                  <button class="row-action-btn" title="Mark complete" data-toast="Task completed" onclick="event.preventDefault();this.closest('.dash-row').classList.toggle('is-done')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </button>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<script src="assets/records.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  // D47B/D48B — approving a needs-you item moves it to Done (a "Sent" receipt
+  // pill for the flagship Bancora proposal, a plain "Approved" pill for the
+  // rest); once all four are handled the board collapses to one quiet line.
+  var NEEDS_YOU_IDS = ['t1', 't9', 'k-bancora-overview', 'workaround-notes'];
+  var DONE_BASE_COUNT = 2;
+
+  function approveNow(id) {
+    NysaState.setApproval(id, 'approved');
+    moveToApprovedDone(id);
+    showToast('Approved');
+    refreshBoardState();
+  }
+  // D39, option B — quick-approve from the list gets the same reversible
+  // treatment as the drawer's Activity receipt, not a vanishing toast. The
+  // flagship "Sent" row (t1) has no Undo — that send is genuinely irreversible.
+  function undoQuickApproval(id) {
+    NysaState.setApproval(id, 'pending');
+    moveBackToNeedsYou(id);
+    showToast('Approval undone');
+    refreshBoardState();
+  }
+  function moveToApprovedDone(id) {
+    var card = document.querySelector('.attention-card[data-approval-id="' + id + '"]');
+    if (card) card.hidden = true;
+    var row = document.querySelector('[data-done-row="' + id + '"]');
+    if (row) row.hidden = false;
+  }
+  function moveBackToNeedsYou(id) {
+    var card = document.querySelector('.attention-card[data-approval-id="' + id + '"]');
+    if (card) card.hidden = false;
+    var row = document.querySelector('[data-done-row="' + id + '"]');
+    if (row) row.hidden = true;
+  }
+  function refreshBoardState() {
+    var needsYouCount = NysaState.countNeedsYou();
+    var countEl = document.getElementById('needs-you-count');
+    if (countEl) countEl.textContent = needsYouCount;
+
+    var approvedCount = NEEDS_YOU_IDS.filter(function (id) { return NysaState.getApproval(id) === 'approved'; }).length;
+    var doneCountEl = document.getElementById('done-count');
+    if (doneCountEl) doneCountEl.textContent = DONE_BASE_COUNT + approvedCount;
+
+    // Jul 13 — the board shows one summary card, not per-task cards
+    var summaryCard = document.getElementById('needs-you-summary');
+    var summaryTitle = document.getElementById('needs-you-summary-title');
+    var summarySub = document.getElementById('needs-you-summary-sub');
+    var clearedLine = document.getElementById('cleared-line');
+    var cleared = needsYouCount === 0;
+    if (summaryCard) summaryCard.hidden = cleared;
+    if (summaryTitle) summaryTitle.textContent = needsYouCount + (needsYouCount === 1 ? ' task needs' : ' tasks need') + ' your review or approval';
+    if (summarySub && NysaState.getApproval('t1') === 'approved') summarySub.textContent = 'All internal changes. Go through them one at a time.';
+    if (clearedLine) clearedLine.hidden = !cleared;
+  }
+  // Jul 13 — expand/collapse for the Assistant-working and Waiting sections.
+  // Single mechanism: toggle the [hidden] attribute and mirror aria-expanded
+  // on the trigger button.
+  function toggleDetails(rowsId, btn) {
+    var rows = document.getElementById(rowsId);
+    if (!rows) return;
+    rows.hidden = !rows.hidden;
+    if (btn) {
+      btn.textContent = rows.hidden ? 'View details' : 'Hide details';
+      btn.setAttribute('aria-expanded', rows.hidden ? 'false' : 'true');
+    }
+  }
+  // Done accordion — same View details / Hide details button mechanism as
+  // toggleDetails above, kept separate so revealDone (the cleared-line link)
+  // can drive it too.
+  function toggleDone() {
+    var rows = document.getElementById('done-rows');
+    var group = document.getElementById('done-group');
+    if (!rows || !group) return;
+    rows.hidden = !rows.hidden;
+    var btn = group.querySelector('.dash-card-header .btn');
+    if (btn) {
+      btn.textContent = rows.hidden ? 'View details' : 'Hide details';
+      btn.setAttribute('aria-expanded', rows.hidden ? 'false' : 'true');
+    }
+  }
+  function revealDone(e) {
+    e.preventDefault();
+    var rows = document.getElementById('done-rows');
+    if (rows) rows.hidden = false;
+    var group = document.getElementById('done-group');
+    if (group) {
+      var btn = group.querySelector('.dash-card-header .btn');
+      if (btn) {
+        btn.textContent = 'Hide details';
+        btn.setAttribute('aria-expanded', 'true');
+      }
+      group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  // Filter menu "Reset demo data" + the cleared-line's "Reset demo" button
+  // both clear NysaState (approvals, chat tasks, revisions) and reload so the
+  // Needs-you review flow is testable again. The onboarding-state key is left
+  // alone — it's a separate, one-time setup receipt, not demo/test state.
+  function resetDemoData(e) {
+    if (e) e.preventDefault();
+    NysaState.reset();
+    showToast('Demo data reset');
+    setTimeout(function () { location.reload(); }, 400);
+  }
+  // Onboarding readiness receipt: shown once after setup completes, then
+  // cleared. Only reads the non-sensitive prototype handoff (capture policy,
+  // grant status, pending request) — never imported content or event detail.
+  var OB_KEY = 'nysa-onboarding-state-v1';
+  function readOnboarding() {
+    try { return JSON.parse(localStorage.getItem(OB_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function dismissSetupReceipt() {
+    var s = readOnboarding();
+    if (s) {
+      s.receiptPending = false;
+      try { localStorage.setItem(OB_KEY, JSON.stringify(s)); } catch (e) {}
+    }
+    document.getElementById('setup-receipt').hidden = true;
+  }
+  function showSetupReceipt() {
+    var s = readOnboarding();
+    if (!s || !s.completed || !s.receiptPending) return;
+    var parts = [];
+    var policy = s.capture && s.capture.policy;
+    parts.push(policy === 'auto'
+      ? 'Meeting capture is on — the bot joins eligible meetings automatically.'
+      : 'Meeting capture is ready — the bot asks before joining.');
+    var missing = [];
+    var grants = s.grants || {};
+    if (grants.gmail !== 'connected') missing.push('Gmail');
+    if (grants.calendar !== 'connected') missing.push('Google Calendar');
+    if (missing.length) {
+      parts.push(missing.join(' and ') + (missing.length > 1 ? ' aren’t' : ' isn’t') +
+        ' connected yet. You can connect ' + (missing.length > 1 ? 'them' : 'it') + ' in Settings.');
+    }
+    if (s.company && s.company.status === 'pending' && s.company.name) {
+      parts.push('Your ' + s.company.name + ' access request is pending.');
+    }
+    document.getElementById('setup-receipt-body').textContent = parts.join(' ');
+    document.getElementById('setup-receipt').hidden = false;
+  }
+  // Chat task intake (Jul 13) — render chat-created tasks at the top of
+  // Assistant working (spec §4.2: every new task starts agent-held). Rows are
+  // built via DOM APIs (never innerHTML with user text). Reset demo data
+  // clears them with the rest of NysaState.
+  function renderChatTasks() {
+    var rows = document.getElementById('assistant-working-rows');
+    var count = document.getElementById('assistant-working-count');
+    if (!rows) return;
+    var chatTasks = NysaState.getChatTasks();
+    chatTasks.slice().reverse().forEach(function (rec) {
+      var a = document.createElement('a');
+      a.className = 'dash-row';
+      a.href = 'tasks-detail.html?id=' + encodeURIComponent(rec.id);
+      var main = document.createElement('div');
+      main.className = 'dash-row-main';
+      var title = document.createElement('span');
+      title.className = 'dash-row-title';
+      title.textContent = rec.title;
+      main.appendChild(title);
+      var dim = document.createElement('span');
+      dim.className = 'dash-row-dim';
+      dim.textContent = 'Reviewing what’s needed to get started';
+      main.appendChild(dim);
+      a.appendChild(main);
+      rows.insertBefore(a, rows.firstChild);
+    });
+    var total = 3 + chatTasks.length;
+    if (count) count.textContent = total;
+    var summarySub = document.getElementById('assistant-summary-sub');
+    if (summarySub && chatTasks.length) {
+      summarySub.textContent = 'Also picking up ' + chatTasks.length + ' new task' + (chatTasks.length === 1 ? '' : 's') + ' from chat. ' + summarySub.textContent;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    NEEDS_YOU_IDS.forEach(function (id) {
+      if (NysaState.getApproval(id) === 'approved') moveToApprovedDone(id);
+    });
+    refreshBoardState();
+    renderChatTasks();
+    showSetupReceipt();
+  });
+</script>
+</body>
+</html>

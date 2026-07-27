@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Set up — Nysa</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/tokens.css">
+  <link rel="stylesheet" href="assets/components.css">
+  <style>
+    /* Onboarding layout — page-local. Sequence: Welcome, Account, Verify,
+       Workspace+invites, Settings, Import, Congratulations. Javier's later
+       clarified decision dropped the left guidance column entirely — every
+       step (wizard or cover) now uses one full-width work column with its
+       own visible title + description. A further approved change unified
+       the title system itself: every step's title uses one font
+       size/line-height (Step 0's) and one shared content width/left edge
+       on every step. Vertical placement is genuine centering of the whole
+       block (title + description + controls) between header and footer —
+       accepted tradeoff: since step bodies differ in height, each title's
+       top position can land at a different height step to step; what's
+       fixed is the font size/width/left edge, not the title's Y position.
+       The centering degrades gracefully to top-aligned + scrollable for
+       any step whose content is taller than the available space (see
+       .ob-content-inner's auto top/bottom margins below). */
+    html, body { height: 100%; }
+    body { background: var(--background); -webkit-font-smoothing: antialiased; }
+    button { cursor: pointer; font-family: inherit; }
+    a { color: inherit; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    :focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
+    .ob-step-title:focus { outline: none; }
+
+    .ob { display: grid; grid-template-columns: 1fr; height: 100vh; }
+
+    /* Work panel — the only column now; fills the full viewport width. */
+    .ob-work { display: grid; grid-template-rows: 64px 1fr auto; height: 100vh; min-width: 0; background: var(--background); }
+    .ob-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; border-bottom: 1px solid var(--border); background: var(--background);
+    }
+    .ob-head-brand {
+      width: fit-content; color: var(--foreground); text-decoration: none;
+      font-size: 19px; font-weight: 800; letter-spacing: -.055em;
+    }
+    .ob-head-progress { font: 500 12px/1 var(--font-sans); color: var(--muted-foreground); }
+
+    /* Flex column + auto top/bottom margins on the child (instead of
+       justify-content: center) is the classic centering trick that
+       degrades gracefully on overflow: when content-inner is shorter
+       than .ob-content, the equal auto margins center it; when it's
+       taller, both auto margins collapse to 0 and it simply top-aligns,
+       so overflow-y: auto can scroll to it without ever clipping the top
+       (which plain justify-content: center would do). min-height: 0 lets
+       this box actually shrink to its grid track instead of growing to
+       fit its content and blowing out the layout. */
+    .ob-content {
+      overflow-y: auto; min-height: 0;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    /* One shared content box for every step — same max-width, same left
+       edge, centered the same way. */
+    .ob-content-inner {
+      width: 100%; max-width: 480px; padding: 40px;
+      margin-top: auto; margin-bottom: auto;
+    }
+
+    /* Every step's title uses Step 0's size/line-height, full stop — this
+       is the piece that used to differ (22px wizard vs 38px cover) and
+       caused visible jumps when moving between steps. */
+    .ob-step-title { margin: 0 0 16px; font-size: 38px; font-weight: 600; line-height: 1.2; letter-spacing: -.02em; }
+    .ob-step-intro { margin: 0 0 24px; color: var(--muted-foreground); font-size: 13px; line-height: 1.5; }
+    .ob:not(.is-cover) .ob-step-intro { margin-bottom: 18px; }
+    /* Every step shows its own title + description in the single work
+       column, on every viewport — there's no separate guide panel to carry
+       any of this, so the column is never a bare control with no heading.
+       Welcome/Done keep a larger, foreground-colored intro treatment; the
+       title above them is identical to every other step's. */
+    .ob.is-cover .ob-step-intro { font-size: 16px; line-height: 1.55; color: var(--foreground); max-width: 540px; margin-bottom: 28px; }
+
+    .ob-footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      min-height: 72px; padding: 12px 32px;
+      border-top: 1px solid var(--border); background: var(--background);
+    }
+    .ob-footer-actions { display: flex; align-items: center; gap: 8px; }
+
+    .ob-btn { height: 44px; padding: 0 22px; font-size: 14px; }
+    .ob-ghost {
+      min-height: 44px; padding: 0 14px; border: 0; border-radius: var(--r-control);
+      background: transparent; color: var(--muted-foreground); font: 400 13px/1 var(--font-sans);
+      display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+    }
+    .ob-ghost:hover { color: var(--foreground); background: var(--muted); }
+    .ob-ghost:disabled { opacity: .4; cursor: default; background: none; color: var(--muted-foreground); }
+    .ob-ghost svg { width: 14px; height: 14px; }
+    .ob-row-btn { height: 36px; padding: 0 14px; }
+    .ob-row-ghost { min-height: 36px; }
+
+    .ob-field { margin-bottom: 18px; }
+    .ob-field > label { display: block; margin-bottom: 8px; }
+    .ob-input { height: 44px; font-size: 14px; }
+    .ob-input[aria-invalid="true"] { border-color: var(--red-9); box-shadow: 0 0 0 3px rgba(220, 38, 38, .08); }
+    .ob-input:disabled { background: var(--muted); color: var(--muted-foreground); }
+    .ob-help { margin: 8px 0 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
+    .ob-error { margin: 8px 0 0; color: var(--red-9); font-size: 12px; line-height: 1.5; }
+    .ob-optional { color: var(--muted-foreground); font-weight: 400; }
+
+    .ob-status-line { margin: 10px 0 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
+    .ob-status-line.is-error { color: var(--red-9); }
+    .ob-callout {
+      margin: 18px 0 0; padding: 12px 14px;
+      border-left: 2px solid var(--border); background: var(--muted);
+      color: var(--muted-foreground); font-size: 12.5px; line-height: 1.5; border-radius: 0 6px 6px 0;
+    }
+    /* Import step: clear separation between the background-import note and
+       the source cards below it (the note has no default bottom margin —
+       it's normally the last thing in a step, not the first). */
+    .ob-callout-spaced { margin-top: 0; margin-bottom: 22px; }
+
+    .ob-row-title { font: 600 14px/1.3 var(--font-sans); display: flex; align-items: center; gap: 8px; }
+    .ob-row-desc { margin: 3px 0 0; color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
+
+    fieldset.ob-fieldset { border: 0; margin: 0 0 16px; padding: 0; min-width: 0; }
+    fieldset.ob-fieldset legend { padding: 0; margin-bottom: 8px; }
+    .ob-choices { display: grid; gap: 8px; }
+    .ob-choice {
+      display: flex; gap: 12px; align-items: flex-start;
+      border: 1px solid var(--border); border-radius: var(--r-card);
+      padding: 12px 16px; cursor: pointer; min-height: 52px;
+    }
+    .ob-choice.selected { border-color: var(--foreground); }
+    .ob-choice input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--foreground); flex-shrink: 0; }
+
+    /* Welcome (cover step) */
+    .ob-benefits { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 12px; }
+    .ob-benefit { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; }
+    .ob-benefit svg { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; color: var(--foreground); }
+    .ob-hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+    .ob-hero-signin { margin: 0; font-size: 13px; color: var(--muted-foreground); }
+    .ob-hero-signin a { color: var(--foreground); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* Google button (Account step) — matches the sign-in page's treatment */
+    .ob-google-btn {
+      width: 100%; max-width: 340px; min-height: 48px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-size: 14px; font-weight: 500; color: #252525; background: #fff;
+      border: 1px solid #d0d0d0; box-shadow: 0 1px 2px rgba(23, 23, 23, .05);
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+    .ob-google-btn:hover:not(:disabled) { border-color: #999; box-shadow: 0 3px 10px rgba(23, 23, 23, .1); }
+    .ob-google-btn:disabled { opacity: .7; cursor: wait; }
+    .ob-google-btn svg { width: 18px; height: 18px; flex: 0 0 18px; }
+
+    /* Dialog account row (Account step's Google chooser) */
+    .ob-avatar-lg { width: 44px; height: 44px; font-size: 15px; }
+
+    .ob-dialog {
+      width: min(calc(100vw - 32px), 400px); background: #fff; margin: 16px;
+      border: 1px solid var(--border); border-radius: 12px; padding: 22px;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+    .ob-dialog-title { margin: 0; font: 600 16px/1.2 var(--font-sans); }
+    .ob-dialog-sub { margin: 4px 0 0; color: var(--muted-foreground); font-size: 12.5px; line-height: 1.5; }
+    .ob-account-option {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+      border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+      background: var(--background); font-family: inherit;
+    }
+    .ob-account-option:hover:not(:disabled) { border-color: var(--foreground); background: var(--muted); }
+    .ob-account-option:disabled { cursor: wait; opacity: .7; }
+    .ob-account-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .ob-account-name { font: 600 13.5px/1.3 var(--font-sans); }
+    .ob-account-email { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
+    .ob-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* Teammate invite rows (Workspace step) — one plain email input per
+       teammate instead of a chip-commit field. */
+    .ob-teammate-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+    .ob-teammate-field { flex: 1; min-width: 0; }
+    .ob-teammate-remove {
+      flex-shrink: 0; width: 44px; height: 44px; border-radius: var(--r-control);
+      border: 1px solid transparent; background: transparent; color: var(--muted-foreground);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ob-teammate-remove:hover { background: var(--muted); color: var(--foreground); }
+    .ob-teammate-remove svg { width: 14px; height: 14px; }
+
+    /* Import source cards */
+    .source-cards { display: grid; gap: 10px; margin-bottom: 4px; }
+    .source-card {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--border); border-radius: var(--r-card); padding: 16px;
+    }
+    .source-logo {
+      width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .source-logo img { width: 100%; height: 100%; display: block; }
+    .source-main { flex: 1; min-width: 0; }
+    .source-action { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+    /* Mobile / tablet: one focused panel */
+    @media (max-width: 899px) {
+      .ob { display: block; height: auto; min-height: 100vh; }
+      .ob-work { display: flex; flex-direction: column; height: auto; min-height: 100vh; }
+      .ob-head { position: sticky; top: 0; z-index: 5; height: 64px; }
+      .ob-content { overflow: visible; flex: 1; }
+      .ob-footer { position: sticky; bottom: 0; z-index: 5; }
+    }
+    @media (max-width: 480px) {
+      .ob-head, .ob-footer { padding-left: 20px; padding-right: 20px; }
+      .ob-content-inner { padding: 26px 20px 30px; }
+      .ob-step-title { font-size: 29px; }
+      .ob-btn { padding: 0 16px; }
+      .source-card { flex-wrap: wrap; }
+      .source-action { flex: 1 1 100%; justify-content: flex-start; margin-left: 58px; }
+    }
+    @media (pointer: coarse) {
+      .ob-row-btn, .ob-row-ghost, .btn { min-height: 44px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ob" id="ob-root">
+
+    <main class="ob-work">
+      <header class="ob-head">
+        <a class="ob-head-brand" href="index.html" aria-label="Nysa prototype home">Nysa</a>
+        <span class="ob-head-progress" id="progress" aria-live="polite" hidden></span>
+      </header>
+
+      <div class="ob-content">
+        <div class="ob-content-inner">
+          <h1 class="ob-step-title" id="step-heading" tabindex="-1"></h1>
+          <p class="ob-step-intro" id="step-intro"></p>
+
+          <!-- 0 · Welcome -->
+          <section data-screen="welcome" hidden>
+            <ul class="ob-benefits">
+              <li class="ob-benefit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>One shared company brain — your whole team works from the same context.</span>
+              </li>
+              <li class="ob-benefit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>Every fact is source-backed — nothing acts until you confirm it.</span>
+              </li>
+              <li class="ob-benefit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span>Connect once — no webhooks, no prompts to write, nothing to maintain.</span>
+              </li>
+            </ul>
+            <div class="ob-hero-actions">
+              <button type="button" class="btn btn-primary ob-btn" id="get-started">Get started</button>
+              <p class="ob-hero-signin">Already have an account? <a href="2026-07-10-sign-in.html">Sign in</a></p>
+            </div>
+          </section>
+
+          <!-- 1 · Account creation with Google -->
+          <section data-screen="account" hidden>
+            <button type="button" class="ob-google-btn" id="google-start">
+              <svg viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+                <path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.716v2.258h2.909c1.702-1.567 2.684-3.874 2.684-6.615Z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.468-.806 5.956-2.18l-2.909-2.258c-.806.54-1.836.859-3.047.859-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/>
+                <path fill="#FBBC05" d="M3.963 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.281-1.707V4.961H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.039l3.007-2.332Z"/>
+                <path fill="#EA4335" d="M9 3.58c1.322 0 2.508.455 3.442 1.346l2.58-2.58C13.464.892 11.43 0 9 0A9 9 0 0 0 .956 4.961l3.007 2.332C4.672 5.165 6.656 3.58 9 3.58Z"/>
+              </svg>
+              <span class="button-label">Continue with Google</span>
+            </button>
+          </section>
+
+          <!-- 2 · Verify information -->
+          <section data-screen="verify" hidden>
+            <form id="verify-form" novalidate>
+              <div class="ob-field">
+                <label for="first-name" class="t-label">First name</label>
+                <input class="input ob-input" id="first-name" type="text" autocomplete="given-name" aria-describedby="first-name-error">
+                <p class="ob-error" id="first-name-error" hidden></p>
+              </div>
+              <div class="ob-field">
+                <label for="last-name" class="t-label">Last name</label>
+                <input class="input ob-input" id="last-name" type="text" autocomplete="family-name" aria-describedby="last-name-error">
+                <p class="ob-error" id="last-name-error" hidden></p>
+              </div>
+              <div class="ob-field">
+                <label for="domain" class="t-label">Company domain</label>
+                <input class="input ob-input" id="domain" type="text" autocomplete="off" aria-describedby="domain-error">
+                <p class="ob-error" id="domain-error" hidden></p>
+              </div>
+              <div class="ob-field" style="margin-bottom: 0">
+                <label for="connected-email" class="t-label">Connected email</label>
+                <input class="input ob-input" id="connected-email" type="email" value="javier@kredi.mx" disabled>
+              </div>
+            </form>
+          </section>
+
+          <!-- 3 · Workspace creation + invites -->
+          <section data-screen="workspace" hidden>
+            <form id="workspace-form" novalidate>
+              <div class="ob-field">
+                <label for="workspace-name" class="t-label">Workspace name</label>
+                <input class="input ob-input" id="workspace-name" type="text" aria-describedby="workspace-error">
+                <p class="ob-error" id="workspace-error" hidden></p>
+              </div>
+
+              <fieldset class="ob-fieldset" style="margin-bottom: 0">
+                <legend class="t-label">Invite teammates <span class="ob-optional">(optional)</span></legend>
+                <div id="invite-rows"></div>
+                <button type="button" class="ob-ghost" id="add-teammate" style="padding-left: 0">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                  Add another
+                </button>
+              </fieldset>
+            </form>
+          </section>
+
+          <!-- 4 · Settings: bot policy -->
+          <section data-screen="settings" hidden>
+            <fieldset class="ob-fieldset" style="margin-bottom: 0">
+              <legend class="t-label">Meeting bot</legend>
+              <div class="ob-choices">
+                <label class="ob-choice">
+                  <input type="radio" name="bot-policy" value="auto" aria-describedby="policy-auto-desc">
+                  <div>
+                    <div class="ob-row-title">Join eligible meetings automatically <span class="chip">Recommended</span></div>
+                    <p class="ob-row-desc" id="policy-auto-desc">The bot joins every eligible meeting that has a link, without asking first.</p>
+                  </div>
+                </label>
+                <label class="ob-choice">
+                  <input type="radio" name="bot-policy" value="ask" aria-describedby="policy-ask-desc">
+                  <div>
+                    <div class="ob-row-title">Ask before joining</div>
+                    <p class="ob-row-desc" id="policy-ask-desc">You confirm at meeting time, before the bot joins.</p>
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+          </section>
+
+          <!-- 5 · Import past knowledge -->
+          <section data-screen="import" hidden>
+            <p class="ob-callout ob-callout-spaced">Import runs in the background so it never blocks you from working — only the content you choose is added, under Kredi's privacy rules. This step is optional.</p>
+            <div class="source-cards">
+              <div class="source-card">
+                <div class="source-logo"><img src="assets/fathom-logo.svg" alt="Fathom logo"></div>
+                <div class="source-main">
+                  <div class="ob-row-title">Fathom</div>
+                  <p class="ob-row-desc">Past recordings and transcripts</p>
+                </div>
+                <div class="source-action" id="fathom-action"></div>
+              </div>
+              <div class="source-card">
+                <div class="source-logo"><img src="assets/granola-logo.svg" alt="Granola logo"></div>
+                <div class="source-main">
+                  <div class="ob-row-title">Granola</div>
+                  <p class="ob-row-desc">Notes from past meetings</p>
+                </div>
+                <div class="source-action" id="granola-action"></div>
+              </div>
+              <div class="source-card">
+                <div class="source-logo"><img src="assets/notion-logo.svg" alt="Notion logo"></div>
+                <div class="source-main">
+                  <div class="ob-row-title">Notion</div>
+                  <p class="ob-row-desc">Selected pages and team knowledge</p>
+                </div>
+                <div class="source-action" id="notion-action"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Final · Congratulations -->
+          <section data-screen="done" hidden>
+            <div class="ob-hero-actions">
+              <a class="btn btn-primary ob-btn" id="go-board" href="tasks.html">Go to home</a>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+      <footer class="ob-footer" id="footer">
+        <button type="button" class="ob-ghost" id="back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          Back
+        </button>
+        <div class="ob-footer-actions">
+          <button type="button" class="btn btn-primary ob-btn" id="next">Continue</button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <p class="sr-only" role="status" aria-live="polite" id="live"></p>
+
+  <!-- Simulated Google account chooser (frontend-only; no real OAuth) -->
+  <div class="modal-overlay" id="google-overlay" hidden>
+    <div class="ob-dialog" role="dialog" aria-modal="true" aria-labelledby="google-dialog-title" aria-describedby="google-dialog-sub">
+      <div>
+        <h2 class="ob-dialog-title" id="google-dialog-title">Choose an account</h2>
+        <p class="ob-dialog-sub" id="google-dialog-sub">to continue to Nysa</p>
+      </div>
+      <button type="button" class="ob-account-option" id="google-account-row">
+        <span class="avatar ob-avatar-lg" aria-hidden="true">JA</span>
+        <span class="ob-account-text">
+          <span class="ob-account-name">Javier Aldape</span>
+          <span class="ob-account-email">javier@kredi.mx</span>
+        </span>
+      </button>
+      <p class="ob-status-line" id="google-status" aria-live="polite" hidden></p>
+      <div class="ob-dialog-actions">
+        <button type="button" class="btn btn-secondary ob-btn" id="google-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // Frontend-only prototype: Google identity, workspace creation, invites,
+    // and knowledge-source connections are all simulated with deterministic
+    // fixtures. No network, no OAuth, no real import.
+
+    var KEY = 'nysa-onboarding-state-v1';
+    var FLOW = ['welcome', 'account', 'verify', 'workspace', 'settings', 'import', 'done'];
+    var PROGRESS_STEPS = ['account', 'verify', 'workspace', 'settings', 'import'];
+    var LABELS = { account: 'Account', verify: 'Verify', workspace: 'Workspace', settings: 'Settings', import: 'Import' };
+    var COVER_STEPS = { welcome: true, done: true };
+    var TITLES = {
+      account: 'Create your Nysa account',
+      verify: 'Confirm your information',
+      workspace: 'Create your workspace',
+      settings: 'Choose how Nysa works with you',
+      import: 'Bring your existing knowledge with you',
+      welcome: 'Your AI Chief of Staff',
+      done: 'Your workspace is ready'
+    };
+    // Verify/workspace/settings/import intros are the richer descriptions
+    // that used to live in the (now-removed) left guide panel — Javier's
+    // call was to move them under the right-side title rather than drop
+    // them. Account's former guide description was already empty by an
+    // earlier round, so it keeps its own short intro instead.
+    var INTROS = {
+      account: 'Connect your Google account to get started.',
+      verify: 'This is what teammates and the company brain will see, and how Nysa tells Kredi apart from Personal.',
+      workspace: 'Everyone you invite to Kredi will work from the same shared context — knowledge compounds instead of living in five separate inboxes.',
+      settings: 'Nysa never records or shares more than you choose here, and you can change any of it later.',
+      import: 'Fathom, Granola, and Notion history becomes searchable context in the background — nothing blocks you from working while it imports.',
+      welcome: 'Nysa joins your meetings, reads your email and keeps your company brain up to date. It then acts on verified knowledge and gets work done.',
+      done: 'Kredi is set up. From here on, approvals and exceptions live on My board.'
+    };
+
+    var ICON = {
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+      x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
+    };
+    var SOURCE_LABEL = { fathom: 'Fathom', granola: 'Granola', notion: 'Notion' };
+    // The 3 initial teammate rows are a fixed base (always present); only
+    // rows added via "Add another" (index >= this) get a remove button.
+    var BASE_INVITE_ROWS = 3;
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    var DOMAIN_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
+
+    function $(sel) { return document.querySelector(sel); }
+    function $$(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+    function esc(str) {
+      return String(str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    // ---------- State ----------
+
+    function defaults() {
+      return {
+        version: 2,
+        step: 'welcome',
+        history: [],
+        account: { connected: false },
+        profile: { firstName: 'Javier', lastName: 'Aldape', domain: 'kredi.mx', email: 'javier@kredi.mx' },
+        // inviteRows is the live, editable draft (one string per visible
+        // input, may include blanks); invites is the committed list saved
+        // at "Create workspace" time — renderDone and downstream reads
+        // only care about the latter.
+        workspace: { name: 'Kredi', created: false, inviteRows: ['', '', ''], invites: [] },
+        settings: { botPolicy: 'auto' },
+        imports: { fathom: false, granola: false, notion: false, started: false },
+        completed: false
+      };
+    }
+
+    // Merge whatever is saved (possibly partial — sign-in writes only
+    // { method: 'create' } — or from the old 8-step schema, or corrupt) over
+    // fresh defaults. Unknown/old keys are simply ignored. Never throws.
+    function merge(saved) {
+      var s = defaults();
+      if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return s;
+      Object.keys(s).forEach(function (k) {
+        var d = s[k], v = saved[k];
+        if (v === undefined) return;
+        if (Array.isArray(d)) { if (Array.isArray(v)) s[k] = v; return; }
+        if (d !== null && typeof d === 'object') {
+          if (v && typeof v === 'object' && !Array.isArray(v)) {
+            Object.keys(d).forEach(function (kk) {
+              if (v[kk] === undefined) return;
+              if (Array.isArray(d[kk]) && !Array.isArray(v[kk])) return;
+              d[kk] = v[kk];
+            });
+          }
+          return;
+        }
+        s[k] = v;
+      });
+      if (FLOW.indexOf(s.step) === -1) s.step = 'welcome';
+      s.history = s.history.filter(function (x) { return FLOW.indexOf(x) !== -1; });
+      // Any step past Welcome without a confirmed Google account is
+      // unrecoverable (e.g. an old-schema save) — restart at Welcome.
+      if (FLOW.indexOf(s.step) > 1 && !s.account.connected) {
+        s.step = 'welcome';
+        s.history = [];
+      }
+      return s;
+    }
+
+    function load() {
+      var raw = null;
+      try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { raw = null; }
+      return merge(raw);
+    }
+    function save() {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    // ?reset=1 (localhost only) clears just this onboarding key for a clean
+    // demo/QA run — never touches nysa-demo-state-v1 or other prototype keys.
+    (function () {
+      if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
+      var params = new URLSearchParams(location.search);
+      if (params.get('reset') !== '1') return;
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      params.delete('reset');
+      try { history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params.toString() : '')); } catch (e) {}
+    })();
+
+    var state = load();
+
+    // ---------- Navigation ----------
+
+    function nextOf(step) {
+      var i = FLOW.indexOf(step);
+      return i === -1 || i === FLOW.length - 1 ? null : FLOW[i + 1];
+    }
+    function goTo(step) {
+      state.history.push(state.step);
+      state.step = step;
+      save();
+      render();
+      focusHeading();
+    }
+    function goBack() {
+      var prev = state.history.pop();
+      if (!prev) return;
+      state.step = prev;
+      save();
+      render();
+      focusHeading();
+    }
+    function focusHeading() {
+      var content = $('.ob-content');
+      if (content) content.scrollTop = 0;
+      window.scrollTo(0, 0);
+      var h = $('#step-heading');
+      if (h) h.focus();
+    }
+    function announce(msg) { $('#live').textContent = msg; }
+
+    // ---------- Per-step validation + continue ----------
+
+    function continueFromVerify() {
+      var first = $('#first-name'), last = $('#last-name'), domain = $('#domain');
+      var firstErr = $('#first-name-error'), lastErr = $('#last-name-error'), domainErr = $('#domain-error');
+      var firstVal = first.value.trim(), lastVal = last.value.trim(), domainVal = domain.value.trim();
+      var invalid = null;
+
+      [first, last, domain].forEach(function (i) { i.removeAttribute('aria-invalid'); });
+      firstErr.hidden = true; lastErr.hidden = true; domainErr.hidden = true;
+
+      if (!firstVal) { first.setAttribute('aria-invalid', 'true'); firstErr.textContent = 'Enter a first name.'; firstErr.hidden = false; invalid = invalid || first; }
+      if (!lastVal) { last.setAttribute('aria-invalid', 'true'); lastErr.textContent = 'Enter a last name.'; lastErr.hidden = false; invalid = invalid || last; }
+      if (!domainVal) {
+        domain.setAttribute('aria-invalid', 'true'); domainErr.textContent = 'Enter a company domain.'; domainErr.hidden = false; invalid = invalid || domain;
+      } else if (!DOMAIN_RE.test(domainVal)) {
+        domain.setAttribute('aria-invalid', 'true'); domainErr.textContent = 'Enter a domain like kredi.mx — no spaces or @.'; domainErr.hidden = false; invalid = invalid || domain;
+      }
+      if (invalid) { invalid.focus(); return; }
+
+      state.profile.firstName = firstVal;
+      state.profile.lastName = lastVal;
+      state.profile.domain = domainVal.toLowerCase();
+      save();
+      goTo('workspace');
+    }
+
+    function continueFromWorkspace() {
+      if (!validateInviteRows(true)) return;
+      var input = $('#workspace-name');
+      var errorEl = $('#workspace-error');
+      var name = input.value.trim();
+      if (!name) {
+        input.setAttribute('aria-invalid', 'true');
+        errorEl.textContent = 'Enter a workspace name.';
+        errorEl.hidden = false;
+        input.focus();
+        return;
+      }
+      input.removeAttribute('aria-invalid');
+      errorEl.hidden = true;
+      state.workspace.name = name;
+      state.workspace.created = true;
+      state.workspace.invites = state.workspace.inviteRows.map(function (v) { return v.trim(); }).filter(Boolean);
+      save();
+      announce(name + ' workspace created.');
+      goTo('settings');
+    }
+
+    function onContinue() {
+      if (state.step === 'verify') { continueFromVerify(); return; }
+      if (state.step === 'workspace') { continueFromWorkspace(); return; }
+      var next = nextOf(state.step);
+      if (state.step === 'import') state.imports.started = anyImportsSelected();
+      if (next) goTo(next);
+    }
+
+    // ---------- Render ----------
+
+    function render() {
+      $$('[data-screen]').forEach(function (el) { el.hidden = el.dataset.screen !== state.step; });
+
+      var cover = !!COVER_STEPS[state.step];
+      $('#ob-root').classList.toggle('is-cover', cover);
+      $('#ob-root').dataset.step = state.step;
+
+      var pIdx = PROGRESS_STEPS.indexOf(state.step);
+      var progress = $('#progress');
+      progress.hidden = pIdx === -1;
+      if (pIdx !== -1) progress.textContent = 'Step ' + (pIdx + 1) + ' of ' + PROGRESS_STEPS.length + ' \u00b7 ' + LABELS[state.step];
+
+      $('#step-heading').textContent = TITLES[state.step] || '';
+      var intro = INTROS[state.step] || '';
+      $('#step-intro').textContent = intro;
+      $('#step-intro').hidden = !intro;
+
+      $('#footer').hidden = cover;
+      $('#back').disabled = state.history.length === 0;
+      $('#next').hidden = state.step === 'account';
+      // renderImport() overrides this for the Import step only.
+      $('#next').textContent = state.step === 'workspace' ? 'Create workspace' : 'Continue';
+
+      if (state.step === 'verify') renderVerify();
+      if (state.step === 'workspace') renderWorkspace();
+      if (state.step === 'settings') renderSettings();
+      if (state.step === 'import') renderImport();
+    }
+
+    function renderVerify() {
+      var first = $('#first-name'), last = $('#last-name'), domain = $('#domain');
+      if (document.activeElement !== first) first.value = state.profile.firstName;
+      if (document.activeElement !== last) last.value = state.profile.lastName;
+      if (document.activeElement !== domain) domain.value = state.profile.domain;
+      $('#connected-email').value = state.profile.email;
+    }
+
+    function renderWorkspace() {
+      var input = $('#workspace-name');
+      if (document.activeElement !== input) input.value = state.workspace.name;
+      renderInviteRows();
+    }
+
+    // inviteRowErrors is transient UI-only state (not persisted): the
+    // current per-row validation message, indexed the same as
+    // state.workspace.inviteRows.
+    var inviteRowErrors = [];
+
+    function renderInviteRows() {
+      var wrap = $('#invite-rows');
+      var rows = state.workspace.inviteRows;
+      var focused = document.activeElement;
+      var focusedRow = focused && focused.dataset ? focused.dataset.row : null;
+      wrap.innerHTML = rows.map(function (val, i) {
+        var errId = 'invite-row-error-' + i;
+        var msg = inviteRowErrors[i] || '';
+        var removable = i >= BASE_INVITE_ROWS;
+        return (
+          '<div class="ob-teammate-row">' +
+            '<div class="ob-teammate-field">' +
+              '<label class="sr-only" for="invite-row-' + i + '">Teammate email ' + (i + 1) + ' (optional)</label>' +
+              '<input class="input ob-input" id="invite-row-' + i + '" data-row="' + i + '" type="email" inputmode="email" autocomplete="off" ' +
+                'placeholder="Teammate ' + (i + 1) + ' email" value="' + esc(val) + '" aria-describedby="' + errId + '"' +
+                (msg ? ' aria-invalid="true"' : '') + '>' +
+              '<p class="ob-error" id="' + errId + '"' + (msg ? '' : ' hidden') + '>' + esc(msg) + '</p>' +
+            '</div>' +
+            (removable ? '<button type="button" class="ob-teammate-remove" data-remove-row="' + i + '" aria-label="Remove teammate email ' + (i + 1) + '">' + ICON.x + '</button>' : '') +
+          '</div>'
+        );
+      }).join('');
+      // Re-focus the row that was focused before the rebuild (renderInviteRows
+      // replaces the DOM nodes, which otherwise drops focus on every render()).
+      if (focusedRow !== null && focusedRow !== undefined) {
+        var toFocus = $('#invite-row-' + focusedRow);
+        if (toFocus) toFocus.focus();
+      }
+    }
+
+    function renderSettings() {
+      $$('input[name="bot-policy"]').forEach(function (r) {
+        r.checked = r.value === state.settings.botPolicy;
+        r.closest('.ob-choice').classList.toggle('selected', r.checked);
+      });
+    }
+
+    function sourceActionHTML(key) {
+      if (state.imports[key]) {
+        return '<span class="pill pill-green">' + ICON.check + 'Connected</span>' +
+          '<button type="button" class="ob-ghost ob-row-ghost" data-disconnect="' + key + '">Disconnect</button>';
+      }
+      return '<button type="button" class="btn btn-secondary ob-row-btn" data-connect="' + key + '">Connect</button>';
+    }
+    function renderImport() {
+      ['fathom', 'granola', 'notion'].forEach(function (key) {
+        $('#' + key + '-action').innerHTML = sourceActionHTML(key);
+      });
+      $('#next').textContent = anyImportsSelected() ? 'Start import' : 'Continue without importing';
+    }
+    function anyImportsSelected() { return state.imports.fathom || state.imports.granola || state.imports.notion; }
+
+    function completeSetup() {
+      state.completed = true;
+      try { localStorage.setItem('nysa-workspace', 'kredi'); } catch (e) {}
+      save();
+    }
+
+    // ---------- Teammate invite rows ----------
+
+    // Validates every visible row (empty rows are always fine — invites stay
+    // optional). Returns false and focuses/renders the first bad row when
+    // any non-empty row fails; never blocks on a row someone left blank.
+    function validateInviteRows(focusFirst) {
+      var rows = state.workspace.inviteRows;
+      var seen = {};
+      var firstInvalid = -1;
+      inviteRowErrors = [];
+      rows.forEach(function (val, i) {
+        var trimmed = val.trim();
+        if (!trimmed) { inviteRowErrors[i] = ''; return; }
+        var lower = trimmed.toLowerCase();
+        if (!EMAIL_RE.test(trimmed)) {
+          inviteRowErrors[i] = 'Enter a valid email address.';
+        } else if (lower === state.profile.email.toLowerCase()) {
+          inviteRowErrors[i] = 'You\u2019re already signed in with this email.';
+        } else if (seen[lower]) {
+          inviteRowErrors[i] = 'You\u2019ve already added this email.';
+        } else {
+          seen[lower] = true;
+          inviteRowErrors[i] = '';
+        }
+        if (inviteRowErrors[i] && firstInvalid === -1) firstInvalid = i;
+      });
+      renderInviteRowErrors();
+      if (firstInvalid !== -1) {
+        if (focusFirst) { var el = $('#invite-row-' + firstInvalid); if (el) el.focus(); }
+        return false;
+      }
+      return true;
+    }
+    function renderInviteRowErrors() {
+      state.workspace.inviteRows.forEach(function (val, i) {
+        var input = $('#invite-row-' + i), err = $('#invite-row-error-' + i);
+        if (!input || !err) return;
+        var msg = inviteRowErrors[i] || '';
+        err.textContent = msg;
+        err.hidden = !msg;
+        if (msg) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
+      });
+    }
+    function removeInviteRow(i) {
+      if (i < BASE_INVITE_ROWS) return;
+      state.workspace.inviteRows.splice(i, 1);
+      inviteRowErrors.splice(i, 1);
+      save();
+      renderInviteRows();
+      announce('Removed teammate email row.');
+      var focusIdx = Math.min(i, state.workspace.inviteRows.length - 1);
+      var el = $('#invite-row-' + focusIdx);
+      if (el) el.focus();
+    }
+    function addInviteRow() {
+      state.workspace.inviteRows.push('');
+      save();
+      renderInviteRows();
+      var el = $('#invite-row-' + (state.workspace.inviteRows.length - 1));
+      if (el) el.focus();
+    }
+    // ---------- Simulated Google account chooser ----------
+
+    var googleTrigger = null;
+
+    function openGoogleDialog() {
+      googleTrigger = $('#google-start');
+      $('#google-status').hidden = true;
+      $('#google-account-row').disabled = false;
+      $('#google-overlay').hidden = false;
+      $('#google-account-row').focus();
+    }
+    function closeGoogleDialog() {
+      $('#google-overlay').hidden = true;
+      if (googleTrigger && document.contains(googleTrigger)) googleTrigger.focus();
+      googleTrigger = null;
+    }
+    function chooseGoogleAccount() {
+      var row = $('#google-account-row'), status = $('#google-status');
+      row.disabled = true;
+      status.hidden = false;
+      status.textContent = 'Connecting to Google\u2026';
+      window.setTimeout(function () {
+        state.account.connected = true;
+        save();
+        $('#google-overlay').hidden = true;
+        googleTrigger = null;
+        announce('Signed in with Google as javier@kredi.mx.');
+        goTo('verify');
+      }, 550);
+    }
+
+    // ---------- Events ----------
+
+    $('#get-started').addEventListener('click', function () { goTo('account'); });
+    $('#google-start').addEventListener('click', openGoogleDialog);
+    $('#google-account-row').addEventListener('click', chooseGoogleAccount);
+    $('#google-cancel').addEventListener('click', closeGoogleDialog);
+    $('#google-overlay').addEventListener('click', function (e) { if (e.target === this) closeGoogleDialog(); });
+    document.addEventListener('keydown', function (e) {
+      var overlay = $('#google-overlay');
+      if (overlay.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeGoogleDialog(); return; }
+      if (e.key !== 'Tab') return;
+      var focusables = overlay.querySelectorAll('button:not(:disabled)');
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    $('#next').addEventListener('click', onContinue);
+    $('#back').addEventListener('click', goBack);
+
+    $('#verify-form').addEventListener('submit', function (e) { e.preventDefault(); continueFromVerify(); });
+    // Belt-and-suspenders: a form with several text inputs doesn't reliably
+    // auto-submit on Enter across browsers, so handle it explicitly too.
+    $('#verify-form').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); continueFromVerify(); }
+    });
+    ['first-name', 'last-name', 'domain'].forEach(function (id) {
+      $('#' + id).addEventListener('input', function () {
+        if (this.getAttribute('aria-invalid') !== 'true') return;
+        this.removeAttribute('aria-invalid');
+        $('#' + id + '-error').hidden = true;
+      });
+    });
+
+    $('#workspace-form').addEventListener('submit', function (e) { e.preventDefault(); continueFromWorkspace(); });
+    // Enter in any workspace-step input (name or a teammate row) submits,
+    // same as Verify — these are now plain fields with no comma/chip-commit
+    // behavior to protect Enter from.
+    $('#workspace-form').addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+      e.preventDefault();
+      continueFromWorkspace();
+    });
+    $('#workspace-name').addEventListener('input', function () {
+      state.workspace.name = this.value;
+      if (this.getAttribute('aria-invalid') === 'true' && this.value.trim()) {
+        this.removeAttribute('aria-invalid');
+        $('#workspace-error').hidden = true;
+      }
+      save();
+    });
+
+    $('#invite-rows').addEventListener('input', function (e) {
+      var input = e.target.closest('input[data-row]');
+      if (!input) return;
+      var i = Number(input.dataset.row);
+      state.workspace.inviteRows[i] = input.value;
+      if (inviteRowErrors[i]) {
+        inviteRowErrors[i] = '';
+        $('#invite-row-error-' + i).hidden = true;
+        input.removeAttribute('aria-invalid');
+      }
+      save();
+    });
+    $('#invite-rows').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-remove-row]');
+      if (btn && !btn.disabled) removeInviteRow(Number(btn.dataset.removeRow));
+    });
+    $('#add-teammate').addEventListener('click', addInviteRow);
+
+    document.addEventListener('change', function (e) {
+      var radio = e.target.closest('input[name="bot-policy"]');
+      if (radio && radio.checked) {
+        state.settings.botPolicy = radio.value;
+        save(); render();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      var connect = e.target.closest('[data-connect]');
+      if (connect) {
+        var key = connect.dataset.connect;
+        state.imports[key] = true;
+        save(); render();
+        announce(SOURCE_LABEL[key] + ' connected.');
+        return;
+      }
+      var disconnect = e.target.closest('[data-disconnect]');
+      if (disconnect) {
+        var dkey = disconnect.dataset.disconnect;
+        state.imports[dkey] = false;
+        save(); render();
+        announce(SOURCE_LABEL[dkey] + ' disconnected.');
+      }
+    });
+
+    $('#go-board').addEventListener('click', completeSetup);
+
+    render();
+  })();
+  </script>
+</body>
+</html>

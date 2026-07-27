@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Calendar — Event — NYSA</title>
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="assets/calendar.css">
+<style>
+  .detail-toggles span { cursor: pointer; }
+  .detail-toggles span.on { color: var(--foreground); font-weight: 500; }
+  .menu-item svg { flex-shrink: 0; }
+</style>
+</head>
+<body>
+<!-- Calendar is a user-level Mission Control surface (spec §4.4): it aggregates every
+     connected account and deliberately does NOT filter with the workspace switcher. -->
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item active" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="calendars-panel">
+    <div class="mini-cal">
+      <div class="mini-cal-header">
+        <svg data-toast="Not in this prototype yet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        <div class="mini-cal-title">July 2026</div>
+        <svg data-toast="Not in this prototype yet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="mini-cal-weekdays">
+        <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+      </div>
+      <div class="mini-cal-row"><div class="mini-cal-day other-month">28</div><div class="mini-cal-day other-month">29</div><div class="mini-cal-day other-month">30</div><div class="mini-cal-day">1</div><div class="mini-cal-day">2</div><div class="mini-cal-day">3</div><div class="mini-cal-day">4</div></div>
+      <div class="mini-cal-row"><div class="mini-cal-day">5</div><div class="mini-cal-day">6</div><div class="mini-cal-day">7</div><div class="mini-cal-day today"><span>8</span></div><div class="mini-cal-day">9</div><div class="mini-cal-day">10</div><div class="mini-cal-day">11</div></div>
+      <div class="mini-cal-row"><div class="mini-cal-day">12</div><div class="mini-cal-day">13</div><div class="mini-cal-day">14</div><div class="mini-cal-day">15</div><div class="mini-cal-day">16</div><div class="mini-cal-day">17</div><div class="mini-cal-day">18</div></div>
+      <div class="mini-cal-row"><div class="mini-cal-day">19</div><div class="mini-cal-day">20</div><div class="mini-cal-day">21</div><div class="mini-cal-day">22</div><div class="mini-cal-day">23</div><div class="mini-cal-day">24</div><div class="mini-cal-day">25</div></div>
+      <div class="mini-cal-row"><div class="mini-cal-day">26</div><div class="mini-cal-day">27</div><div class="mini-cal-day">28</div><div class="mini-cal-day">29</div><div class="mini-cal-day">30</div><div class="mini-cal-day">31</div><div class="mini-cal-day other-month">1</div></div>
+      <div class="mini-cal-row"><div class="mini-cal-day other-month">2</div><div class="mini-cal-day other-month">3</div><div class="mini-cal-day other-month">4</div><div class="mini-cal-day other-month">5</div><div class="mini-cal-day other-month">6</div><div class="mini-cal-day other-month">7</div><div class="mini-cal-day other-month">8</div></div>
+    </div>
+
+    <div class="cal-divider"></div>
+
+    <div class="cal-group">
+      <div class="cal-group-header t-section">JALDAPE@KREDI.MX</div>
+      <div class="cal-row" data-cal="kredi-cal"><span class="cal-swatch" style="background:var(--blue-9)"></span><span class="cal-label">Kredi Calendar</span></div>
+      <div class="cal-row" data-cal="company-holidays"><span class="cal-swatch" style="background:var(--purple-9)"></span><span class="cal-label">Company Holidays</span></div>
+      <div class="cal-row" data-cal="team-birthdays"><span class="cal-swatch" style="background:#e93d82"></span><span class="cal-label">Team Birthdays</span></div>
+    </div>
+
+    <div class="cal-group">
+      <div class="cal-group-header t-section">PERSONAL (GMAIL)</div>
+      <div class="cal-row" data-cal="personal"><span class="cal-swatch" style="background:var(--slate-9)"></span><span class="cal-label">Personal</span></div>
+      <div class="cal-row" data-cal="family"><span class="cal-swatch" style="background:#12a594"></span><span class="cal-label">Family</span></div>
+      <div class="cal-row" data-cal="health"><span class="cal-swatch" style="background:#30a56c"></span><span class="cal-label">Health</span></div>
+    </div>
+
+    <div class="cal-group">
+      <div class="cal-group-header t-section">JALDAPE@HANDYPASS.COM</div>
+      <div class="cal-row" data-cal="handypass"><span class="cal-swatch" style="background:var(--amber-9)"></span><span class="cal-label">HandyPass</span></div>
+      <div class="cal-row" data-cal="investors"><span class="cal-swatch" style="background:#f76b15"></span><span class="cal-label">Investors</span></div>
+      <div class="cal-row" data-cal="product"><span class="cal-swatch" style="background:#e5484d"></span><span class="cal-label">Product</span></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="week-area">
+      <div class="week-header">
+        <h1 class="t-page-title">Calendar</h1>
+        <div class="week-header-right">
+          <span class="week-range t-secondary" id="week-range"></span>
+          <span style="position:relative;display:inline-flex;">
+            <button class="week-select-btn" data-menu>Week <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="menu-popover" style="top:30px;right:0;min-width:140px;">
+              <a class="menu-item" href="#" data-toast="Not in this prototype yet">Day</a>
+              <a class="menu-item" href="#" onclick="event.preventDefault()">Week <svg style="width:14px;height:14px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></a>
+              <a class="menu-item" href="#" data-toast="Not in this prototype yet">Month</a>
+            </div>
+          </span>
+          <button class="week-select-btn" id="today-btn">Today</button>
+          <button class="week-nav-btn" aria-label="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+          <button class="week-nav-btn" aria-label="Next week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="week-grid">
+        <div class="week-grid-corner"></div>
+
+        <div class="week-day-headers"><!-- rendered by calendar-data.js --></div>
+
+        <div class="week-gutter">
+          <div class="allday-label">All day</div>
+          <div class="hour-labels">
+            <div class="hour-label" style="top:0">06:00</div>
+            <div class="hour-label" style="top:64px">07:00</div>
+            <div class="hour-label" style="top:128px">08:00</div>
+            <div class="hour-label" style="top:192px">09:00</div>
+            <div class="hour-label" style="top:256px">10:00</div>
+            <div class="hour-label" style="top:320px">11:00</div>
+            <div class="hour-label" style="top:384px">12:00</div>
+            <div class="hour-label" style="top:448px">13:00</div>
+            <div class="hour-label" style="top:512px">14:00</div>
+            <div class="hour-label" style="top:576px">15:00</div>
+            <div class="hour-label" style="top:640px">16:00</div>
+            <div class="hour-label" style="top:704px">17:00</div>
+            <div class="hour-label" style="top:768px">18:00</div>
+            <div class="hour-label" style="top:832px">19:00</div>
+            <div class="hour-label" style="top:896px">20:00</div>
+            <div class="hour-label" style="top:960px">21:00</div>
+            <div class="hour-label" style="top:1024px">22:00</div>
+          </div>
+        </div>
+
+        <div class="allday-row"><!-- rendered by calendar-data.js --></div>
+
+        <div class="week-body"><!-- rendered by calendar-data.js --></div>
+      </div>
+    </div>
+  </div>
+
+  <a class="drawer-scrim" href="calendar.html" aria-label="Close event"></a>
+  <div class="drawer">
+
+    <!-- D46B state 1 (default): upcoming event, enriched — prep links, attendees, capture policy/status -->
+    <div class="drawer-body" data-event="kredi-offsite">
+      <div class="drawer-head">
+        <h2 class="drawer-title">Kredi offsite planning</h2>
+        <a class="icon-btn" href="calendar.html" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </a>
+      </div>
+
+      <div class="detail-header">
+        <span style="position:relative;display:inline-flex;">
+          <div class="detail-header-left" data-menu>Event <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+          <div class="menu-popover" style="top:22px;left:0;min-width:140px;">
+            <a class="menu-item" href="#" onclick="event.preventDefault()">Event <svg style="width:14px;height:14px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></a>
+            <a class="menu-item" href="#" data-toast="Not in this prototype yet">Task</a>
+            <a class="menu-item" href="#" data-toast="Not in this prototype yet">Reminder</a>
+          </div>
+        </span>
+        <span style="position:relative;display:inline-flex;">
+          <div class="detail-header-more" data-menu><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          <div class="menu-popover" style="top:22px;right:0;">
+            <a class="menu-item" href="#" data-toast="Event link copied">Copy link</a>
+            <a class="menu-item" href="#" data-toast="Not in this prototype yet">Duplicate</a>
+            <div class="menu-separator"></div>
+            <a class="menu-item danger" href="#" data-toast="Not in this prototype yet">Delete event</a>
+          </div>
+        </span>
+      </div>
+
+      <div>
+        <div class="detail-time-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>2 PM</span>
+          <span class="muted-arrow">→</span>
+          <span>3 PM</span>
+          <span class="duration">1h</span>
+        </div>
+        <div class="detail-date">Wed Jul 8</div>
+      </div>
+
+      <div class="detail-toggles">
+        <span onclick="this.classList.toggle('on')">All-day</span>
+        <span onclick="this.classList.toggle('on')">Time zone</span>
+        <span onclick="this.classList.toggle('on')">Repeat</span>
+      </div>
+
+      <div class="detail-meta-group">
+        <div class="detail-meta-row detail-attendees">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          <div class="avatar-stack"><div class="avatar avatar-20">JA</div></div>
+          <b>Javier Aldape</b>
+        </div>
+        <div class="detail-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Conferencing
+        </div>
+        <div class="detail-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+          Recording: <b>Ask before this meeting</b>
+        </div>
+        <div class="detail-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          Capture: <b>Desktop app ready</b>
+        </div>
+        <div class="detail-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          Location
+        </div>
+      </div>
+
+      <div class="detail-attach-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        Add links and attachments
+      </div>
+
+      <div class="detail-description">Description</div>
+
+      <!-- D24A prep block, now with live links into the records the bullets name (D46). -->
+      <div class="prep-section">
+        <div class="prep-title">Prep</div>
+        <ul class="prep-list">
+          <li>Venue still unconfirmed — <a href="tasks-detail.html?id=t10">waiting on the coordinator since Jul 5</a></li>
+          <li>Open task: <a href="tasks-detail.html?id=t8">"Buy a gift for the Kredi offsite"</a> — not yet assigned</li>
+          <li>Related: <a class="attention-link" href="tasks-detail.html?id=t1">Bancora proposal due the same week (Jul 10)</a></li>
+        </ul>
+      </div>
+
+      <div class="detail-cal-tag">
+        <span class="detail-cal-dot"></span>
+        Kredi Calendar
+      </div>
+
+      <div class="detail-status-row">
+        <span>Busy</span>
+        <span>Default visibility</span>
+      </div>
+
+      <div>
+        <div class="detail-reminder-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+          Reminders
+        </div>
+        <div class="detail-reminder-value"><b>10 min</b> <span>before</span></div>
+      </div>
+    </div>
+
+    <!-- D46B state 2: processed past event — capture receipt + follow-up state (the calendar side of the loop) -->
+    <div class="drawer-body" data-event="bancora-sync" hidden>
+      <div class="drawer-head">
+        <h2 class="drawer-title">Bancora sync</h2>
+        <a class="icon-btn" href="calendar.html" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </a>
+      </div>
+
+      <div class="detail-header">
+        <span style="position:relative;display:inline-flex;">
+          <div class="detail-header-left" data-menu>Event <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+          <div class="menu-popover" style="top:22px;left:0;min-width:140px;">
+            <a class="menu-item" href="#" onclick="event.preventDefault()">Event <svg style="width:14px;height:14px;margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></a>
+            <a class="menu-item" href="#" data-toast="Not in this prototype yet">Task</a>
+            <a class="menu-item" href="#" data-toast="Not in this prototype yet">Reminder</a>
+          </div>
+        </span>
+        <span style="position:relative;display:inline-flex;">
+          <div class="detail-header-more" data-menu><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div>
+          <div class="menu-popover" style="top:22px;right:0;">
+            <a class="menu-item" href="#" data-toast="Event link copied">Copy link</a>
+            <a class="menu-item" href="#" data-toast="Not in this prototype yet">Duplicate</a>
+            <div class="menu-separator"></div>
+            <a class="menu-item danger" href="#" data-toast="Not in this prototype yet">Delete event</a>
+          </div>
+        </span>
+      </div>
+
+      <div>
+        <div class="detail-time-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>10 AM</span>
+          <span class="muted-arrow">→</span>
+          <span>10:45 AM</span>
+          <span class="duration">45m</span>
+        </div>
+        <div class="detail-date">Mon Jul 6</div>
+      </div>
+
+      <div class="detail-meta-group">
+        <div class="detail-meta-row detail-attendees">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          <div class="avatar-stack"><div class="avatar avatar-20">JA</div><div class="avatar avatar-20">MD</div><div class="avatar avatar-20">AR</div></div>
+          <b>Javier Aldape, Marco Del Toro, Ana Reyes</b>
+        </div>
+        <div class="detail-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+          Recording: <b>Auto-record</b>
+        </div>
+        <div class="detail-meta-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+          Capture: <b>Processed · 45 min recording</b>
+        </div>
+      </div>
+
+      <!-- Follow-up state: what the assistant did with this meeting (spec §4.4 / §6). -->
+      <div class="prep-section">
+        <div class="prep-title">After the meeting</div>
+        <ul class="prep-list">
+          <li class="followup-receipt">2 persons filed · 3 commitments · 1 knowledge edit</li>
+          <li id="followup-t1">Follow-up: <a class="attention-link" href="tasks-detail.html?id=t1">proposal awaiting your approval</a></li>
+          <li><a href="meeting-bancora.html">Open meeting page →</a></li>
+        </ul>
+      </div>
+
+      <div class="detail-cal-tag">
+        <span class="detail-cal-dot"></span>
+        Kredi Calendar
+      </div>
+
+      <div class="detail-status-row">
+        <span>Busy</span>
+        <span>Default visibility</span>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/app.js"></script>
+<script src="assets/records.js"></script>
+<script src="assets/calendar-data.js"></script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+/* Tasks board + detail drawer — Figma 45:109 "Tasks — My board" / 198:3589 "Tasks — detail open" */
+/* Jul 13 — board restyled to the "shadcn dashboard" direction (bordered
+   dash-cards, card-header/card-content split, muted separators, rotating
+   accordion chevrons). Rules below are shared by tasks.html, tasks-detail.html
+   and tasks-review.html; anything that only the old summary-card/attention-
+   list board used has been removed. */
+
+/* Daily Brief (D23A) / Setup receipt — dashboard card treatment */
+.daily-brief { background: var(--background); border: 1px solid var(--border); border-radius: var(--r-card); padding: 14px 16px; margin-bottom: 16px; }
+.daily-brief-head { display: flex; align-items: center; justify-content: space-between; }
+.daily-brief-title { font: 600 11px/14px var(--font-sans); color: var(--muted-foreground); text-transform: uppercase; letter-spacing: .04em; }
+.daily-brief-head .icon-btn { width: 24px; height: 24px; }
+.daily-brief-head .icon-btn svg { width: 13px; height: 13px; }
+.daily-brief-body { font: 400 13px/1.5 var(--font-sans); color: var(--foreground); margin: 6px 0 0; }
+
+/* ---- Section cards: card-header + card-content ---- */
+.dash-card { border: 1px solid var(--border); border-radius: var(--r-card); background: var(--background); overflow: hidden; }
+.dash-card + .dash-card { margin-top: 16px; }
+.dash-card-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.dash-card-title-group { display: flex; align-items: baseline; gap: 8px; flex: 1; min-width: 0; }
+.dash-card-title { font: 600 14px/1.3 var(--font-sans); color: var(--foreground); }
+.dash-card-count {
+  font: 600 11px/1 var(--font-sans); color: var(--muted-foreground);
+  background: var(--muted); border-radius: var(--r-pill); padding: 2px 8px;
+}
+.dash-card-content { padding: 6px 18px 16px; }
+
+/* Quiet chevron toggle, rotates when open */
+.chev-btn {
+  width: 24px; height: 24px; border-radius: var(--r-control);
+  background: transparent; border: none; display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted-foreground); flex-shrink: 0;
+}
+.chev-btn:hover { background: var(--muted); color: var(--foreground); }
+.chev-btn svg { width: 15px; height: 15px; transition: transform .16s ease; }
+.chev-btn.is-open svg { transform: rotate(90deg); }
+.dash-card-header.is-clickable { cursor: pointer; }
+
+/* Needs-you summary — banner-ish within its card */
+.needs-you-body { display: flex; align-items: center; gap: 16px; padding: 4px 0 10px; }
+.needs-you-text { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.needs-you-title { font: 600 14px/1.3 var(--font-sans); color: var(--foreground); }
+.needs-you-sub { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); }
+a.needs-you-link { text-decoration: none; color: inherit; display: block; }
+a.needs-you-link:hover .needs-you-title { text-decoration: underline; }
+
+/* D48B — cleared summary line replaces the Needs-you summary at zero */
+.cleared-line {
+  display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 4px 10px;
+  font: 400 13px/1.3 var(--font-sans); color: var(--muted-foreground);
+  text-decoration: none; cursor: pointer;
+}
+.cleared-check { width: 16px; height: 16px; border-radius: 50%; background: var(--green-11); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Rows shared by Assistant working / Waiting / Done boards — muted-separator list */
+.dash-rows { display: flex; flex-direction: column; }
+.dash-row {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 0;
+  border-bottom: 1px solid var(--border); text-decoration: none; color: inherit;
+}
+.dash-row:last-child { border-bottom: none; }
+.dash-row:hover { background: var(--muted); margin: 0 -18px; padding: 8px 18px; }
+.dash-row-main { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dash-row-title { font: 500 13px/1.3 var(--font-sans); color: var(--foreground); display: flex; align-items: center; gap: 8px; }
+.dash-row-dim { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-row-dim.is-waiting { color: var(--red-9); }
+/* Consistent mark-complete treatment: one .is-done class, per-context styling */
+.dash-row.is-done { opacity: .45; }
+
+/* Groups still used by the detail drawer (tasks-detail.html) */
+.task-group { display: flex; flex-direction: column; }
+.group-head { cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.group-head svg { width: 14px; height: 14px; color: var(--muted-foreground); flex-shrink: 0; }
+.task-group-label { font: 500 12px/14px var(--font-sans); color: var(--muted-foreground); }
+.task-group-count { font: 400 12px/14px var(--font-sans); color: var(--muted-foreground); }
+.review-all-link { margin-left: auto; font: 500 12px/14px var(--font-sans); color: var(--iris-11); text-decoration: none; }
+.review-all-link:hover { text-decoration: underline; }
+
+/* Needs-you cards (shared .attention-card) — used by tasks-detail.html */
+.task-cards { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
+.needs-you-card-left { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.needs-you-card-title {
+  font: 600 14px/17px var(--font-sans);
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.needs-you-card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* D38, option B — demoted-in-place look; card keeps its group and its slot
+   in the Needs-you count, just visually dimmed with a small label. */
+.attention-card.revision-pending { opacity: .6; }
+.revision-tag {
+  font: 500 12px/14px var(--font-sans);
+  color: var(--muted-foreground);
+  background: var(--muted);
+  border-radius: 6px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.draft-card.revision-pending { opacity: .7; }
+
+/* Yours-to-do — full visible checklist, actions on the right (hard requirement) */
+.todo-rows { display: flex; flex-direction: column; }
+.todo-row { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.todo-row:last-child { border-bottom: none; }
+.todo-row:hover { background: var(--muted); margin: 0 -18px; padding: 6px 18px; }
+.todo-main { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; text-decoration: none; color: inherit; }
+.todo-title { font: 500 13px/1.3 var(--font-sans); color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.todo-row.is-done .todo-title { text-decoration: line-through; color: var(--muted-foreground); }
+.todo-context { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); white-space: nowrap; flex-shrink: 0; }
+
+/* Task table (Assistant working / Waiting on others) — shared .table-head/.table-row grid, used by tasks-detail.html */
+.cols-tasks { grid-template-columns: 1fr 240px 64px; }
+.task-rows { display: flex; flex-direction: column; margin-top: 4px; }
+.cell-task { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cell-task .cell-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell-dim.is-waiting { color: var(--red-9); }
+
+/* Chips (task-specific modifiers on shared .chip) */
+.chip-project { color: var(--muted-foreground); }
+.chip-ws-amber { background: var(--amber-3); color: var(--amber-11); }
+.chip-ws-gray { background: #F0F0F3; color: #60646C; }
+
+/* Persistent row action icon buttons — always-visible muted fill */
+.row-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.row-action-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-control);
+  background: var(--muted);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--foreground);
+  flex-shrink: 0;
+}
+.row-action-btn:hover { background: var(--border); }
+.row-action-btn svg { width: 13px; height: 13px; }
+
+/* D48B — Done rows for approved needs-you items */
+.done-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+.done-row:last-child { border-bottom: none; }
+.done-row:hover { background: var(--muted); margin: 0 -18px; padding: 6px 18px; }
+.done-row-title {
+  font: 400 13px/1.3 var(--font-sans);
+  color: var(--foreground);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.receipt-check svg, .cleared-check svg, .pill svg { width: 9px; height: 9px; flex-shrink: 0; }
+/* D39, option B — persistent Undo lives on the Activity/Done receipt itself. */
+.activity-undo { flex-shrink: 0; background: none; border: none; padding: 0; cursor: pointer; font: 500 12px/16px var(--font-sans); color: var(--foreground); text-decoration: underline; }
+
+/* ===================== Detail drawer (shared .drawer/.drawer-scrim; spacing-only, zero dividers) ===================== */
+.panel-state { font: 500 13px/16px var(--font-sans); color: var(--iris-11); margin-top: 6px; display: inline-block; }
+
+.panel-meta { display: flex; flex-direction: column; }
+.panel-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.panel-meta-label { width: 96px; flex-shrink: 0; font: 400 13px/16px var(--font-sans); color: var(--muted-foreground); }
+.panel-meta-value { font: 400 13px/16px var(--font-sans); color: var(--foreground); }
+.panel-meta-value a { color: var(--foreground); }
+
+.draft-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.draft-preview { font: 400 13px/1.5 var(--font-sans); color: var(--foreground); margin: 0; }
+.draft-view-link { font: 500 13px/16px var(--font-sans); color: var(--foreground); text-decoration: underline; }
+.draft-buttons { display: flex; align-items: center; gap: 8px; }
+.btn-ghost { background: transparent; border: none; color: var(--foreground); }
+
+.panel-activity { display: flex; flex-direction: column; gap: 8px; }
+.activity-entry { display: flex; align-items: flex-start; gap: 8px; }
+.activity-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.activity-text { font: 400 13px/16px var(--font-sans); color: var(--foreground); }
+
+.panel-spacer { flex: 1; }
+.panel-footer { display: flex; align-items: center; gap: 12px; margin-top: auto; padding-top: 12px; }
+.panel-footer-link {
+  font: 500 12px/14px var(--font-sans);
+  color: var(--foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.panel-footer-link.is-drop { color: var(--red-9); margin-left: auto; }
+
+/* D20B — on-demand Meeting→Task trace side panel */
+.trace-link {
+  background: none; border: none; padding: 0; margin-left: 8px;
+  font: 500 12px/16px var(--font-sans); color: var(--iris-11);
+  text-decoration: underline; cursor: pointer;
+}
+.trace-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.15); z-index: 70; }
+.trace-panel {
+  position: fixed; top: 0; right: 420px; height: 100%; width: 320px;
+  background: var(--background); border-left: 1px solid var(--border);
+  box-shadow: -8px 0 24px rgba(0,0,0,.08);
+  z-index: 71; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+}
+.trace-head { display: flex; align-items: center; justify-content: space-between; }
+.trace-steps { display: flex; flex-direction: column; gap: 4px; }
+.trace-step {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+  text-decoration: none; color: inherit;
+}
+.trace-step.is-current { background: var(--iris-3); border-color: var(--accent-border); }
+.trace-step-kind { font: 500 11px/14px var(--font-sans); color: var(--muted-foreground); text-transform: uppercase; letter-spacing: .02em; }
+.trace-step-title { font: 400 13px/1.4 var(--font-sans); color: var(--foreground); }
+.trace-arrow { text-align: center; color: var(--muted-foreground); font-size: 12px; }
+
+/* D47B — receipt card replaces the decision block once the flagship email is sent */
+.receipt-card {
+  border: 1px solid var(--green-11);
+  border-radius: 8px;
+  background: var(--green-3);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.receipt-head { display: flex; align-items: center; gap: 8px; }
+.receipt-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--green-11);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.receipt-title { font: 600 13px/1.3 var(--font-sans); color: var(--green-11); }
+.receipt-meta { display: flex; flex-direction: column; gap: 3px; padding-left: 26px; }
+.receipt-line { font: 400 12px/1.4 var(--font-sans); color: var(--green-11); opacity: .85; }
+.receipt-link { font: 500 12px/1.4 var(--font-sans); color: var(--green-11); text-decoration: underline; }
+
+/* D21B — dedicated review stepper (tasks-review.html) */
+.review-body { background: #FAFAFB; }
+.review-shell { max-width: 640px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 24px 20px 60px; }
+.review-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 48px; }
+.review-exit { display: flex; align-items: center; gap: 6px; font: 500 13px/1 var(--font-sans); color: var(--muted-foreground); text-decoration: none; }
+.review-exit svg { width: 14px; height: 14px; }
+.review-exit:hover { color: var(--foreground); }
+.review-progress { display: flex; align-items: center; gap: 10px; flex: 1; max-width: 260px; }
+.review-progress-track { flex: 1; height: 4px; border-radius: 2px; background: var(--muted); overflow: hidden; }
+.review-progress-fill { height: 100%; background: var(--iris-9); transition: width .2s ease; }
+.review-progress-label { font: 500 12px/1 var(--font-sans); color: var(--muted-foreground); white-space: nowrap; }
+
+.review-stage { display: flex; justify-content: center; }
+.review-card { width: 100%; background: var(--background); border: 1px solid var(--border); border-radius: 14px; padding: 32px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.review-card-head { display: flex; align-items: center; gap: 8px; }
+.review-card-title { font: 600 20px/1.3 var(--font-sans); color: var(--foreground); margin: 0; }
+.review-card-note { font: 400 14px/1.55 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+/* D40, option A — the destination line spelling out what Approve actually does. */
+.review-card-destination { font: 500 13px/1.5 var(--font-sans); color: var(--foreground); margin: -6px 0 0; }
+.review-card-status { margin-top: -4px; }
+.review-card-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.review-edit-row { display: none; gap: 8px; }
+.review-edit-row.open { display: flex; }
+
+.review-receipt { max-width: 380px; margin: 80px auto 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+.review-receipt-icon { width: 40px; height: 40px; color: var(--green-11); background: var(--green-3); border-radius: 50%; padding: 10px; box-sizing: border-box; }
+.review-receipt-title { font: 600 20px/1.3 var(--font-sans); margin: 8px 0 0; color: var(--foreground); }
+.review-receipt-body { font: 400 14px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 0 0 12px; }

@@ -1,0 +1,402 @@
+/* Calendar shared styles — calendar.html + calendar-event.html */
+
+/* Calendars panel (left, 240w) */
+.calendars-panel {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100vh;
+  overflow: auto;
+}
+
+/* Mini month calendar */
+.mini-cal { width: 200px; }
+.mini-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.mini-cal-header .mini-cal-title { font: 600 13px/1.3 var(--font-sans); }
+.mini-cal-header svg { width: 14px; height: 14px; color: var(--muted-foreground); cursor: pointer; }
+.mini-cal-weekdays, .mini-cal-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.mini-cal-weekdays div {
+  font: 400 10px/1 var(--font-sans);
+  color: var(--muted-foreground);
+  text-align: center;
+  padding-bottom: 6px;
+}
+.mini-cal-day {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 400 10px/1 var(--font-sans);
+  color: #000;
+}
+.mini-cal-day.other-month { color: #b3b3b3; }
+.mini-cal-day.today {
+  border-radius: var(--r-pill);
+  background: #000;
+  color: #fff;
+}
+.mini-cal-day > span {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+}
+
+.cal-divider { border-top: 1px solid var(--border); }
+/* D44A: the mini-cal row of the week currently on the grid */
+.mini-cal-row.viewing { background: var(--muted); border-radius: 6px; }
+
+.cal-group { display: flex; flex-direction: column; gap: 8px; }
+.cal-group-header { padding-bottom: 2px; }
+.cal-row {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* D45A: calendar rows are toggles — hollow swatch + dim label when off */
+.cal-row[data-cal] { cursor: pointer; }
+.cal-row.off .cal-swatch { background: transparent !important; border: 1.5px solid var(--border); }
+.cal-row.off .cal-label { color: var(--muted-foreground); }
+.cal-swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+.cal-label { font: 400 13px/1.3 var(--font-sans); color: var(--foreground); }
+
+/* Week area (right side) */
+.week-area {
+  padding: 32px;
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  overflow: auto;
+}
+.week-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.week-header-right { display: flex; align-items: center; gap: 8px; }
+.week-range { margin-right: 4px; }
+.week-select-btn {
+  height: 28px;
+  border-radius: var(--r-control);
+  padding: 0 10px;
+  font: 500 13px/1 var(--font-sans);
+  background: var(--background);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.week-select-btn svg { width: 14px; height: 14px; color: var(--muted-foreground); }
+.week-nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--foreground);
+}
+.week-nav-btn svg { width: 14px; height: 14px; }
+
+/* Week grid */
+.week-grid {
+  margin-top: 45px;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  grid-template-rows: 28px auto 1024px;
+}
+.week-grid-corner { grid-column: 1; grid-row: 1; }
+
+.week-day-headers {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+}
+.day-header {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 12px/1 var(--font-sans);
+  color: var(--muted-foreground);
+}
+.day-header.today {
+  background: var(--red-9);
+  color: #fff;
+  border-radius: 6px;
+  margin: 0 4px;
+}
+
+.week-gutter { grid-column: 1; grid-row: 2 / 4; position: relative; }
+.allday-label {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  font: 400 10px/1 var(--font-sans);
+  color: var(--muted-foreground);
+}
+.hour-labels { position: relative; height: 1024px; }
+.hour-label {
+  position: absolute;
+  left: 0;
+  right: 8px;
+  text-align: right;
+  transform: translateY(-50%);
+  font: 400 11px/1 var(--font-sans);
+  color: var(--muted-foreground);
+}
+
+.allday-row {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  min-height: 30px;
+  padding: 4px 0;
+}
+.allday-cell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 0 4px;
+}
+.allday-cell.weekend { background: #f6f6f6; }
+.allday-chip {
+  height: 22px;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font: 500 12px/1 var(--font-sans);
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+/* All-day chip colorways (token-bound; hardcoded hex retired in the Jul 10 calendar auto-fix batch).
+   Decision 43B: the Company Holiday chip follows its calendar's purple, not iris. */
+.allday-chip.allday-purple { background: var(--purple-3); border-color: var(--purple-9); color: var(--purple-11); }
+.allday-chip.allday-slate { background: var(--slate-3); border-color: var(--slate-9); color: var(--slate-11); }
+/* Quiet due-date chip: distinct from meeting/holiday all-day chips — dashed, muted, no fill */
+.allday-chip.due {
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  gap: 5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.allday-chip.due svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+.week-body {
+  grid-column: 2;
+  grid-row: 3;
+  display: flex;
+  height: 1024px;
+  position: relative;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 63px, var(--border) 63px, var(--border) 64px);
+}
+.day-col {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  border-right: 1px solid var(--border);
+}
+.day-col:last-child { border-right: none; }
+.day-col.weekend { background: #f6f6f6; }
+
+.cal-event {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  min-height: 44px;
+  border-radius: 6px;
+  border: 1px solid;
+  padding: 6px 8px 6px 11px;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+}
+.cal-event::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.cal-event .event-title {
+  font: 500 12px/1.3 var(--font-sans);
+  color: inherit;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cal-event .event-lock { width: 10px; height: 10px; vertical-align: -1px; opacity: .7; }
+.cal-event .event-sub {
+  font: 400 10px/1.3 var(--font-sans);
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-event.selected { border-width: 1.5px; border-color: #000 !important; }
+
+/* Decision 43B: Kredi calendar events are blue (calendar-source semantic);
+   iris is reserved for needs-you. .event-iris kept only as a legacy alias. */
+.event-blue { background: var(--blue-3); border-color: var(--blue-9); color: var(--blue-11); }
+.event-iris { background: var(--blue-3); border-color: var(--blue-9); color: var(--blue-11); }
+.event-gray { background: var(--slate-3); border-color: var(--slate-9); color: var(--slate-11); }
+.event-amber { background: var(--amber-3); border-color: var(--amber-9); color: var(--amber-11); }
+
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: var(--red-9);
+}
+.now-line::before {
+  content: "";
+  position: absolute;
+  left: -3.5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red-9);
+}
+
+/* Event detail (calendar-event.html) — lives inside the shared .drawer.
+   D46B: the drawer hosts two states (.drawer-body[data-event]); calendar-data.js
+   shows the one matching ?id= (kredi-offsite default, bancora-sync processed). */
+.drawer-body { display: flex; flex-direction: column; gap: 20px; }
+.detail-attendees { color: var(--foreground); }
+.detail-attendees b { font-weight: 500; }
+.detail-meta-row b { color: var(--foreground); font-weight: 500; }
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.detail-header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 500 13px/1 var(--font-sans);
+  color: var(--foreground);
+  cursor: pointer;
+}
+.detail-header-left svg { width: 14px; height: 14px; color: var(--muted-foreground); }
+.detail-header-more { color: var(--muted-foreground); cursor: pointer; }
+.detail-header-more svg { width: 16px; height: 16px; }
+
+.detail-time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 13px/1 var(--font-sans);
+}
+.detail-time-row svg { width: 16px; height: 16px; color: var(--foreground); }
+.detail-time-row .muted-arrow, .detail-time-row .duration { color: var(--muted-foreground); font-weight: 400; }
+.detail-date { margin-top: 4px; font: 400 13px/1.3 var(--font-sans); color: var(--foreground); }
+
+.detail-toggles {
+  display: flex;
+  gap: 16px;
+  font: 400 13px/1 var(--font-sans);
+  color: #8b8b8b;
+}
+
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 400 13px/1.3 var(--font-sans);
+  color: #8b8b8b;
+}
+.detail-meta-row svg { width: 16px; height: 16px; flex-shrink: 0; }
+.detail-meta-group { display: flex; flex-direction: column; gap: 14px; }
+
+.detail-attach-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 400 13px/1.3 var(--font-sans);
+  color: #8b8b8b;
+}
+.detail-attach-row svg { width: 16px; height: 16px; }
+
+.detail-description { font: 400 13px/1.3 var(--font-sans); color: #8b8b8b; }
+
+/* D24A — static pre-meeting prep block, Calendar event drawer only. */
+.prep-section { background: #F7F7F9; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.prep-title { font: 600 11px/1 var(--font-sans); text-transform: uppercase; letter-spacing: .04em; color: var(--muted-foreground); }
+.prep-list { margin: 8px 0 0; padding-left: 16px; display: flex; flex-direction: column; gap: 6px; font: 400 13px/1.5 var(--font-sans); color: var(--foreground); }
+/* D46: prep/follow-up bullets link to the records they name; iris only when the
+   reference is a needs-you item (R1-D8 grammar). */
+.prep-list a { color: var(--foreground); text-decoration: underline; text-underline-offset: 2px; }
+.prep-list a.attention-link { color: var(--iris-11); text-decoration: none; font-weight: 500; }
+.prep-list .followup-receipt { color: var(--muted-foreground); }
+
+.detail-cal-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 13px/1 var(--font-sans);
+  color: #000;
+}
+.detail-cal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue-9); flex-shrink: 0; }
+
+.detail-status-row {
+  display: flex;
+  gap: 16px;
+  font: 400 13px/1 var(--font-sans);
+  color: #000;
+}
+
+.detail-reminder-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 400 13px/1.3 var(--font-sans);
+  color: #8b8b8b;
+}
+.detail-reminder-head svg { width: 16px; height: 16px; }
+.detail-reminder-value {
+  margin-top: 6px;
+  font: 400 13px/1 var(--font-sans);
+}
+.detail-reminder-value b { font-weight: 500; color: #000; }
+.detail-reminder-value span { color: #8b8b8b; }

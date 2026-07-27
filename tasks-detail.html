@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+<meta charset="UTF-8">
+<title>Tasks — detail — NYSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="assets/tasks.css">
+<style>
+  /* Page-local: drop-task confirm dialog (pattern from companies-selected.html),
+     move-to-workspace popover anchor, ask-for-changes inline row */
+  .dialog { width: 340px; background: #fff; border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .dialog-body { display: flex; flex-direction: column; gap: 8px; }
+  .dialog-title { font: 600 16px/1.2 var(--font-sans); color: #000; margin: 0; }
+  .dialog-text { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .btn-danger { background: var(--red-9); color: #fff; }
+  .move-wrap { position: relative; }
+  .move-wrap .menu-popover { bottom: 26px; left: 0; }
+  .changes-row { display: none; gap: 8px; }
+  .changes-row.open { display: flex; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR SNIPPET START -->
+  <div class="sidebar">
+    <div class="sidebar-workspace">
+      <div class="sidebar-workspace-header">
+        <div class="sidebar-logo-tile"><img src="assets/kredi-logo.png" alt="Kredi"></div>
+        <div class="sidebar-workspace-name">Kredi</div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+      </div>
+    </div>
+    <div class="sidebar-collapse" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </div>
+    <div class="workspace-popover">
+      <div class="workspace-popover-label">Your workspaces</div>
+      <div class="workspace-row" data-workspace-id="personal">
+        <div class="workspace-tile tile-p">P</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Personal</div>
+          <div class="workspace-row-sub">Personal workspace</div>
+        </div>
+      </div>
+      <div class="workspace-row" data-workspace-id="kredi">
+        <div class="workspace-tile tile-kredi"><img src="assets/kredi-logo.png" alt=""></div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">Kredi</div>
+          <div class="workspace-row-sub">Company workspace</div>
+        </div>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <div class="workspace-row" data-workspace-id="handypass">
+        <div class="workspace-tile tile-h">H</div>
+        <div class="workspace-row-text">
+          <div class="workspace-row-name">HandyPass</div>
+          <div class="workspace-row-sub">Side venture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Mission Control</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="chat" href="chat.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </a>
+        <a class="nav-item" data-nav="notes" href="notes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M16 2v20"/></svg>
+          Notes
+        </a>
+        <a class="nav-item active" data-nav="tasks" href="tasks.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v14"/><path d="M12 3v8"/><path d="M19 3v18"/></svg>
+          Tasks
+        </a>
+        <a class="nav-item" data-nav="calendar" href="calendar.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          Calendar
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-nav">
+        <a class="nav-item" data-nav="overview" href="overview.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-nav="projects" href="projects.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M8 10v4"/><path d="M12 10v2"/><path d="M16 10v6"/></svg>
+          Projects
+        </a>
+        <a class="nav-item" data-nav="meetings" href="meetings.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Meetings
+        </a>
+        <a class="nav-item" data-nav="companies" href="companies.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg>
+          Companies
+        </a>
+        <a class="nav-item" data-nav="persons" href="persons.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+          Persons
+        </a>
+        <a class="nav-item" data-nav="knowledge" href="knowledge.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+          Knowledge
+        </a>
+        <a class="nav-item" data-nav="files" href="files.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg>
+          Files
+        </a>
+        <a class="nav-item" data-nav="skills" href="skills.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          Skills
+        </a>
+        <a class="nav-item" data-nav="cron" href="cron.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Automations
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="menu-popover">
+        <a class="menu-item" href="#" data-toast="Not in this prototype yet">Profile</a>
+        <a class="menu-item" href="settings.html">Workspace settings</a>
+        <a class="menu-item" href="settings.html#notifications">Notification preferences</a>
+        <div class="menu-separator"></div>
+        <a class="menu-item danger" href="#" data-toast="Signed out">Log out</a>
+      </div>
+      <div class="sidebar-footer-header" data-menu>
+        <img class="sidebar-avatar" src="assets/avatar.png" alt="Javier Aldape">
+        <div class="sidebar-footer-name">Javier Aldape</div>
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+  </div>
+  <!-- SIDEBAR SNIPPET END -->
+
+  <div class="main">
+    <div class="page-wrap">
+
+      <div class="page-head">
+        <h1 class="t-page-title">Tasks</h1>
+        <a class="btn btn-secondary" href="#" data-toast="Not in this prototype yet">New task</a>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-secondary tasks-filter-btn" data-toast="Not in this prototype yet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filter
+        </button>
+      </div>
+
+      <!-- Daily Brief (D23A) -->
+      <div class="daily-brief" id="daily-brief" hidden>
+        <div class="daily-brief-head">
+          <span class="daily-brief-title">Since yesterday</span>
+          <button type="button" class="icon-btn" aria-label="Dismiss" onclick="dismissBrief()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <p class="daily-brief-body">The Bancora proposal is drafted and ready for your approval. Legal hasn't responded on the redlines in 2 days. The Kredi offsite venue is still unconfirmed.</p>
+      </div>
+
+      <!-- Needs you -->
+      <div class="task-group">
+        <div class="group-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          <span class="task-group-label">Needs you</span>
+          <span class="task-group-count" id="needs-you-count">4</span>
+          <a class="review-all-link" href="tasks-review.html" onclick="event.stopPropagation()">Review all</a>
+        </div>
+        <div class="task-cards" id="needs-you-cards">
+          <a class="attention-card" data-approval-id="t1" href="tasks-detail.html?id=t1">
+            <div class="needs-you-card-left">
+              <span class="needs-you-card-title">Send Bancora integration proposal</span>
+              <span class="chip chip-project">Bancora</span>
+            </div>
+            <div class="needs-you-card-actions">
+              <span class="btn btn-iris btn-sm" onclick="event.preventDefault();event.stopPropagation();quickApprove('t1')">Approve</span>
+              <span class="btn btn-iris-outline btn-sm">Review</span>
+            </div>
+          </a>
+          <a class="attention-card" data-approval-id="t9" href="tasks-detail.html?id=t9">
+            <div class="needs-you-card-left">
+              <span class="needs-you-card-title">Review July board agenda draft</span>
+              <span class="chip chip-project">Board Ops</span>
+            </div>
+            <div class="needs-you-card-actions">
+              <span class="btn btn-iris btn-sm" onclick="event.preventDefault();event.stopPropagation();quickApprove('t9')">Approve</span>
+              <span class="btn btn-iris-outline btn-sm">Review</span>
+            </div>
+          </a>
+          <a class="attention-card" data-approval-id="k-bancora-overview" href="tasks-detail.html?id=k-bancora-overview">
+            <div class="needs-you-card-left">
+              <span class="needs-you-card-title">Knowledge edit — Bancora Account Overview</span>
+              <span class="chip chip-project">Bancora</span>
+            </div>
+            <div class="needs-you-card-actions">
+              <span class="btn btn-iris btn-sm" onclick="event.preventDefault();event.stopPropagation();quickApprove('k-bancora-overview')">Approve</span>
+              <span class="btn btn-iris-outline btn-sm">Review</span>
+            </div>
+          </a>
+          <a class="attention-card" data-approval-id="workaround-notes" href="tasks-detail.html?id=workaround-notes">
+            <div class="needs-you-card-left">
+              <span class="needs-you-card-title">Publish workaround notes to Knowledge</span>
+              <span class="chip chip-project">Bancora</span>
+            </div>
+            <div class="needs-you-card-actions">
+              <span class="btn btn-iris btn-sm" onclick="event.preventDefault();event.stopPropagation();quickApprove('workaround-notes')">Approve</span>
+              <span class="btn btn-iris-outline btn-sm">Review</span>
+            </div>
+          </a>
+        </div>
+        <!-- D48B — quiet cleared-summary line, shown once Needs-you reaches 0 -->
+        <a class="cleared-line" id="cleared-line" href="#done-group" onclick="revealDone(event)" hidden>
+          <span class="cleared-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </span>
+          <span>Cleared — 4 handled today · <span style="text-decoration:underline">receipts in Done</span></span>
+        </a>
+      </div>
+
+      <div class="table-head cols-tasks">
+        <span>Task</span>
+        <span>Context</span>
+        <span></span>
+      </div>
+
+      <!-- Assistant working -->
+      <div class="task-group">
+        <div class="group-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          <span class="task-group-label">Assistant working</span>
+          <span class="task-group-count">3</span>
+        </div>
+        <div class="task-rows">
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t3">
+            <div class="cell-task">
+              <span class="cell-title">Reschedule demo with Altiva</span>
+              <span class="chip chip-project">Altiva</span>
+            </div>
+            <span class="cell-dim">Checking calendar availability with Altiva's team</span>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t7">
+            <div class="cell-task">
+              <span class="cell-title">Set up HandyPass Stripe account</span>
+              <span class="chip chip-project">HandyPass Launch</span>
+              <span class="chip chip-ws-amber">HandyPass</span>
+            </div>
+            <span class="cell-dim">Filling out the Stripe onboarding form</span>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t14">
+            <div class="cell-task">
+              <span class="cell-title">Prep talking points for Altiva demo</span>
+              <span class="chip chip-project">Altiva</span>
+            </div>
+            <span class="cell-dim">Pulling deal history and past objections</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Waiting on others -->
+      <div class="task-group">
+        <div class="group-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          <span class="task-group-label">Waiting on others</span>
+          <span class="task-group-count">2</span>
+        </div>
+        <div class="task-rows">
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t5">
+            <div class="cell-task">
+              <span class="cell-title">Loop in legal team on redlines</span>
+              <span class="chip chip-project">Bancora</span>
+            </div>
+            <span class="cell-dim">With legal since Jul 6</span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Nudge sent" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
+              </button>
+            </div>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t10">
+            <div class="cell-task">
+              <span class="cell-title">Confirm venue for Kredi offsite</span>
+              <span class="chip chip-project">Kredi Offsite</span>
+            </div>
+            <span class="cell-dim is-waiting">Venue coordinator, since Jul 5</span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Nudge sent" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
+              </button>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Yours to do -->
+      <div class="task-group">
+        <div class="group-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          <span class="task-group-label">Yours to do</span>
+          <span class="task-group-count">5</span>
+        </div>
+        <div class="task-rows">
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t2">
+            <div class="cell-task">
+              <span class="cell-title">Draft board update</span>
+              <span class="chip chip-project">Board Ops</span>
+            </div>
+            <span class="cell-dim"></span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Handed off to assistant" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              </button>
+            </div>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t6">
+            <div class="cell-task">
+              <span class="cell-title">Follow up on redlines review</span>
+              <span class="chip chip-project">Bancora</span>
+            </div>
+            <span class="cell-dim">From Bancora sync, Jul 6</span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Handed off to assistant" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              </button>
+            </div>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t8">
+            <div class="cell-task">
+              <span class="cell-title">Buy a gift for the Kredi offsite</span>
+            </div>
+            <span class="cell-dim"></span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Handed off to assistant" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              </button>
+            </div>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t4">
+            <div class="cell-task">
+              <span class="cell-title">Renew passport</span>
+              <span class="chip chip-ws-gray">Personal</span>
+            </div>
+            <span class="cell-dim"></span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Handed off to assistant" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              </button>
+            </div>
+          </a>
+          <a class="table-row cols-tasks" href="tasks-detail.html?id=t12">
+            <div class="cell-task">
+              <span class="cell-title">Update HandyPass landing page copy</span>
+              <span class="chip chip-project">HandyPass Launch</span>
+              <span class="chip chip-ws-amber">HandyPass</span>
+            </div>
+            <span class="cell-dim"></span>
+            <div class="row-actions">
+              <button class="row-action-btn" data-toast="Task marked complete" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>
+              <button class="row-action-btn" data-toast="Handed off to assistant" onclick="event.preventDefault()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+              </button>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Done (collapsed; D48B — approved needs-you items land here as receipt rows) -->
+      <div class="task-group" id="done-group">
+        <div class="group-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          <span class="task-group-label">Done</span>
+          <span class="task-group-count" id="done-count">2</span>
+        </div>
+        <div class="task-rows" id="done-rows" style="display:none">
+          <a class="done-row" href="tasks-detail.html?id=t1" data-done-row="t1" hidden>
+            <span class="done-row-title">Send Bancora integration proposal</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              Sent
+            </span>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=t9" data-done-row="t9" hidden>
+            <span class="done-row-title">Review July board agenda draft</span>
+            <span class="chip chip-project">Board Ops</span>
+            <span class="pill pill-green">Approved</span>
+            <button type="button" class="activity-undo" onclick="event.preventDefault();event.stopPropagation();undoQuickApproval('t9')">Undo</button>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=k-bancora-overview" data-done-row="k-bancora-overview" hidden>
+            <span class="done-row-title">Knowledge edit — Bancora Account Overview</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">Approved</span>
+            <button type="button" class="activity-undo" onclick="event.preventDefault();event.stopPropagation();undoQuickApproval('k-bancora-overview')">Undo</button>
+          </a>
+          <a class="done-row" href="tasks-detail.html?id=workaround-notes" data-done-row="workaround-notes" hidden>
+            <span class="done-row-title">Publish workaround notes to Knowledge</span>
+            <span class="chip chip-project">Bancora</span>
+            <span class="pill pill-green">Approved</span>
+            <button type="button" class="activity-undo" onclick="event.preventDefault();event.stopPropagation();undoQuickApproval('workaround-notes')">Undo</button>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="drawer-scrim" onclick="location.href='tasks.html'"></div>
+    <div class="drawer">
+      <div class="drawer-head">
+        <h2 class="drawer-title">Send Bancora integration proposal</h2>
+        <a class="icon-btn" href="tasks.html" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </a>
+      </div>
+      <span class="panel-state">Needs you</span>
+
+      <div class="panel-meta">
+        <div class="panel-meta-row">
+          <span class="panel-meta-label">Workspace</span>
+          <span class="panel-meta-value">Kredi</span>
+        </div>
+        <div class="panel-meta-row">
+          <span class="panel-meta-label">Project</span>
+          <span class="panel-meta-value"><a href="project-bancora.html">Bancora</a></span>
+        </div>
+        <div class="panel-meta-row">
+          <span class="panel-meta-label">Source</span>
+          <span class="panel-meta-value">
+            <a href="meeting-bancora.html">Commitment from Bancora sync — Jul 6</a>
+            <button type="button" class="trace-link" id="trace-trigger" onclick="openTrace()">View trace</button>
+          </span>
+        </div>
+        <div class="panel-meta-row">
+          <span class="panel-meta-label">Created</span>
+          <span class="panel-meta-value">Jul 6</span>
+        </div>
+        <div class="panel-meta-row">
+          <span class="panel-meta-label">Due</span>
+          <span class="panel-meta-value">Jul 10</span>
+        </div>
+      </div>
+
+      <div class="draft-card">
+        <span class="t-section">Draft for approval</span>
+        <p class="draft-preview">Hi Marco, attached is the formal integration proposal we discussed on Monday. It covers the phased rollout we agreed on, the data-sharing terms pending legal review, and a target timeline for a signed agreement before end of month. Let me know if anything needs adjusting before it goes out.</p>
+        <a class="draft-view-link" href="document-proposal.html">view full draft</a>
+        <div class="draft-buttons">
+          <button class="btn btn-iris" onclick="approveDraft()">Approve</button>
+          <button class="btn btn-secondary" data-toast="Not in this prototype yet">Edit draft</button>
+          <button class="btn btn-ghost" onclick="toggleChanges()">Ask for changes</button>
+        </div>
+        <div class="changes-row" id="changes-row">
+          <input class="input" id="changes-input" type="text" placeholder="Tell the assistant what to change…" onkeydown="if(event.key==='Enter')sendChanges()">
+          <button class="btn btn-primary" onclick="sendChanges()">Send</button>
+        </div>
+      </div>
+
+      <div class="panel-activity">
+        <span class="t-section">Activity</span>
+        <div class="activity-entry">
+          <span class="activity-dot"></span>
+          <span class="activity-text">Draft proposal prepared · Jul 7</span>
+        </div>
+        <div class="activity-entry">
+          <span class="activity-dot"></span>
+          <span class="activity-text">Deal history pulled from Bancora thread · Jul 7</span>
+        </div>
+        <div class="activity-entry">
+          <span class="activity-dot"></span>
+          <span class="activity-text">Task created from meeting commitment · Jul 6</span>
+        </div>
+        <!-- D39, option B — genuinely-irreversible contrast, grounded in t5
+             (Loop in legal team on redlines, Waiting on others). -->
+        <div class="activity-entry">
+          <span class="activity-dot"></span>
+          <span class="activity-text" style="flex:1;">Redlines sent to legal for review · Jul 6</span>
+          <span class="pill pill-gray">Sent — not reversible</span>
+        </div>
+      </div>
+
+      <div class="panel-spacer"></div>
+
+      <div class="panel-footer">
+        <button class="panel-footer-link" onclick="completeTask()">Complete</button>
+        <button class="panel-footer-link" onclick="handOff()">Hand off to assistant</button>
+        <span class="move-wrap">
+          <button class="panel-footer-link" data-menu>Move to workspace…</button>
+          <div class="menu-popover">
+            <a class="menu-item" href="#" data-toast="Task moved to Personal">Personal</a>
+            <a class="menu-item" href="#" data-toast="Task is already in Kredi">Kredi</a>
+            <a class="menu-item" href="#" data-toast="Task moved to HandyPass">HandyPass</a>
+          </div>
+        </span>
+        <button class="panel-footer-link is-drop" onclick="document.getElementById('drop-overlay').hidden=false">Drop task</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="drop-overlay" hidden onclick="if(event.target===this)this.hidden=true">
+    <div class="dialog">
+      <div class="dialog-body">
+        <h2 class="dialog-title">Drop this task?</h2>
+        <p class="dialog-text">The assistant stops working on it and the task is marked Dropped. This can't be undone.</p>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('drop-overlay').hidden=true">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="dropTask()">Drop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- D20B — on-demand Meeting→Task trace side panel. Compact causal chain, not a workflow builder. -->
+  <div class="trace-scrim" id="trace-scrim" hidden onclick="closeTrace()"></div>
+  <div class="trace-panel" id="trace-panel" hidden>
+    <div class="trace-head">
+      <span class="t-section">How this task got here</span>
+      <button type="button" class="icon-btn" aria-label="Close" onclick="closeTrace()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="trace-steps">
+      <a class="trace-step" href="meeting-bancora.html">
+        <span class="trace-step-kind">Meeting</span>
+        <span class="trace-step-title">Bancora sync — Jul 6</span>
+      </a>
+      <div class="trace-arrow">↓</div>
+      <div class="trace-step is-static">
+        <span class="trace-step-kind">Commitment detected</span>
+        <span class="trace-step-title">"I can have a formal proposal doc over to you both by end of week" — Javier, 00:26</span>
+      </div>
+      <div class="trace-arrow">↓</div>
+      <div class="trace-step is-static is-current">
+        <span class="trace-step-kind">Task created</span>
+        <span class="trace-step-title">Send Bancora integration proposal</span>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="assets/records.js"></script>
+<script src="assets/app.js"></script>
+<script>
+// D19 — resolve the drawer to the record the user actually clicked (thin real
+// shell for anything that isn't the flagship "Send Bancora integration
+// proposal" task, which keeps its fully authored content below).
+var TASK_ID = new URLSearchParams(location.search).get('id') || 't1';
+if (!window.NYSA.TASKS[TASK_ID]) TASK_ID = 't1';
+var TASK = window.NYSA.TASKS[TASK_ID];
+var GROUP_LABELS = { 'needs-you': 'Needs you', 'assistant-working': 'Assistant working', 'waiting-on-others': 'Waiting on others', 'yours-to-do': 'Yours to do', 'done': 'Done' };
+
+function metaRow(label, valueHtml) {
+  return '<div class="panel-meta-row"><span class="panel-meta-label">' + label + '</span><span class="panel-meta-value">' + valueHtml + '</span></div>';
+}
+
+function buildThinShell() {
+  document.querySelector('.drawer-title').textContent = TASK.title;
+  var isApproval = !!TASK.approvalId;
+  document.querySelector('.panel-state').textContent = isApproval ? 'Needs you' : (GROUP_LABELS[TASK.group] || 'Yours to do');
+
+  var meta = metaRow('Workspace', TASK.workspace);
+  if (TASK.project) meta += metaRow('Project', TASK.projectHref ? '<a href="' + TASK.projectHref + '">' + TASK.project + '</a>' : TASK.project);
+  if (TASK.context) meta += metaRow('Status', TASK.context);
+  document.querySelector('.panel-meta').innerHTML = meta;
+
+  var bodyHtml;
+  if (isApproval) {
+    bodyHtml = '<div class="draft-card"><span class="t-section">Draft for approval</span>' +
+      '<p class="draft-preview">' + (TASK.note || 'Ready for your review.') + '</p>' +
+      (TASK.knowledgeHref ? '<a class="draft-view-link" href="' + TASK.knowledgeHref + '">view Knowledge draft</a>' : '') +
+      '<div class="draft-buttons">' +
+        '<button class="btn btn-iris" onclick="approveDraft()">Approve</button>' +
+        '<button class="btn btn-ghost" onclick="toggleChanges()">Ask for changes</button>' +
+      '</div>' +
+      '<div class="changes-row" id="changes-row">' +
+        '<input class="input" id="changes-input" type="text" placeholder="Tell the assistant what to change…" onkeydown="if(event.key===\'Enter\')sendChanges()">' +
+        '<button class="btn btn-primary" onclick="sendChanges()">Send</button>' +
+      '</div></div>';
+  } else {
+    bodyHtml = '<div class="draft-card"><span class="t-section">Details</span>' +
+      '<p class="draft-preview">' + (TASK.note || 'No additional detail has been captured for this task yet.') + '</p></div>';
+  }
+  document.querySelector('.draft-card').outerHTML = bodyHtml;
+  document.querySelector('.panel-activity').innerHTML = '<span class="t-section">Activity</span><div class="activity-entry"><span class="activity-dot"></span><span class="activity-text">Task created · Jul 6</span></div>';
+}
+
+// D47B — the flagship Bancora email gets a dedicated green receipt card in
+// place of the draft; every other approval keeps the plain "Approved" pill.
+var RECEIPT_CARD_HTML = '<div class="receipt-card">' +
+    '<div class="receipt-head">' +
+      '<span class="receipt-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>' +
+      '<span class="receipt-title">Sent to Marco Del Toro</span>' +
+    '</div>' +
+    '<div class="receipt-meta">' +
+      '<span class="receipt-line">Jul 8, 2:14 PM · via Gmail</span>' +
+      '<a class="receipt-link" href="#" data-toast="Not in this prototype yet">View thread ↗</a>' +
+    '</div>' +
+  '</div>';
+
+function renderApprovedDrawer() {
+  if (TASK.approvalId === 't1') {
+    setState('Sent', 'var(--green-11)');
+    var card = document.querySelector('.draft-card');
+    if (card) card.outerHTML = RECEIPT_CARD_HTML;
+  } else {
+    setState('Approved', 'var(--green-11)');
+    var buttons = document.querySelector('.draft-buttons');
+    if (buttons) buttons.innerHTML = '<span class="pill pill-green">Approved — sending it</span>';
+    addApprovalActivity();
+  }
+}
+function applyStoredApprovalToDrawer() {
+  if (TASK.approvalId && NysaState.getApproval(TASK.approvalId) === 'approved') {
+    renderApprovedDrawer();
+  } else if (TASK.approvalId && NysaState.getRevision(TASK.approvalId)) {
+    showRevisionPending();
+  }
+}
+
+// D48B — approving a needs-you item moves it to Done; once all four are
+// handled the board collapses to one quiet line (shared with tasks.html).
+var NEEDS_YOU_IDS = ['t1', 't9', 'k-bancora-overview', 'workaround-notes'];
+var DONE_BASE_COUNT = 2;
+var BRIEF_DEFAULT = 'The Bancora proposal is drafted and ready for your approval. Legal hasn’t responded on the redlines in 2 days. The Kredi offsite venue is still unconfirmed.';
+var BRIEF_CLEARED = 'Nothing needs you right now. Legal hasn’t responded on the redlines in 2 days. The Kredi offsite venue is still unconfirmed.';
+
+function moveToApprovedDone(id) {
+  var card = document.querySelector('.attention-card[data-approval-id="' + id + '"]');
+  if (card) card.hidden = true;
+  var row = document.querySelector('[data-done-row="' + id + '"]');
+  if (row) row.hidden = false;
+}
+function moveBackToNeedsYou(id) {
+  var card = document.querySelector('.attention-card[data-approval-id="' + id + '"]');
+  if (card) card.hidden = false;
+  var row = document.querySelector('[data-done-row="' + id + '"]');
+  if (row) row.hidden = true;
+}
+function refreshBoardState() {
+  var needsYouCount = NysaState.countNeedsYou();
+  var countEl = document.getElementById('needs-you-count');
+  if (countEl) countEl.textContent = needsYouCount;
+
+  var approvedCount = NEEDS_YOU_IDS.filter(function (id) { return NysaState.getApproval(id) === 'approved'; }).length;
+  var doneCountEl = document.getElementById('done-count');
+  if (doneCountEl) doneCountEl.textContent = DONE_BASE_COUNT + approvedCount;
+
+  var cardsWrap = document.getElementById('needs-you-cards');
+  var clearedLine = document.getElementById('cleared-line');
+  var reviewLink = document.querySelector('.review-all-link');
+  var briefBody = document.querySelector('#daily-brief .daily-brief-body');
+  var cleared = needsYouCount === 0;
+  if (cardsWrap) cardsWrap.hidden = cleared;
+  if (clearedLine) clearedLine.hidden = !cleared;
+  if (reviewLink) reviewLink.hidden = cleared;
+  if (briefBody) briefBody.textContent = cleared ? BRIEF_CLEARED : BRIEF_DEFAULT;
+}
+function revealDone(e) {
+  e.preventDefault();
+  var rows = document.getElementById('done-rows');
+  if (rows) rows.style.display = '';
+  var group = document.getElementById('done-group');
+  if (group) group.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function quickApprove(id) {
+  NysaState.setApproval(id, 'approved');
+  showToast('Approved');
+  moveToApprovedDone(id);
+  refreshBoardState();
+  if (id === TASK_ID) applyStoredApprovalToDrawer();
+}
+// D39, option B — quick-approve from the list gets the same reversible
+// treatment as the drawer's Activity receipt, not a vanishing toast. The
+// flagship "Sent" row (t1) has no Undo — that send is genuinely irreversible.
+function undoQuickApproval(id) {
+  NysaState.setApproval(id, 'pending');
+  moveBackToNeedsYou(id);
+  showToast('Approval undone');
+  refreshBoardState();
+  if (id === TASK_ID) {
+    setState('Needs you');
+    var buttons = document.querySelector('.draft-buttons');
+    if (buttons) buttons.innerHTML = draftButtonsHtml();
+    var row = document.getElementById('approval-activity-row');
+    if (row) row.remove();
+  }
+}
+function dismissBrief() {
+  NysaState.dismissBrief();
+  document.getElementById('daily-brief').hidden = true;
+}
+
+// Page-local drawer actions — prototype state swaps only.
+function setState(text, color) {
+  var s = document.querySelector('.panel-state');
+  s.textContent = text;
+  s.style.color = color || '';
+}
+function approveDraft() {
+  if (TASK.approvalId) NysaState.setApproval(TASK.approvalId, 'approved');
+  showToast('Draft approved — it will be sent');
+  renderApprovedDrawer();
+  var changesRow = document.getElementById('changes-row');
+  if (changesRow) changesRow.classList.remove('open');
+  if (TASK.approvalId) moveToApprovedDone(TASK.approvalId);
+  refreshBoardState();
+}
+// D39, option B — persistent Activity receipt with a live Undo, instead of
+// a timed toast. The flagship t1 send gets no Undo — the static "Redlines —
+// not reversible" row above shows the contrast the option calls for once an
+// action truly can't be undone.
+function addApprovalActivity() {
+  if (TASK_ID === 't1') return;
+  var list = document.querySelector('.panel-activity');
+  if (!list || document.getElementById('approval-activity-row')) return;
+  var row = document.createElement('div');
+  row.className = 'activity-entry';
+  row.id = 'approval-activity-row';
+  row.innerHTML = '<span class="activity-dot"></span>' +
+    '<span class="activity-text" style="flex:1;">Approved · just now</span>' +
+    '<button type="button" class="activity-undo" onclick="undoApproval()">Undo</button>';
+  var heading = list.querySelector('.t-section');
+  if (heading) list.insertBefore(row, heading.nextSibling);
+}
+function draftButtonsHtml() {
+  return TASK_ID === 't1'
+    ? '<button class="btn btn-iris" onclick="approveDraft()">Approve</button>' +
+      '<button class="btn btn-secondary" data-toast="Not in this prototype yet">Edit draft</button>' +
+      '<button class="btn btn-ghost" onclick="toggleChanges()">Ask for changes</button>'
+    : '<button class="btn btn-iris" onclick="approveDraft()">Approve</button>' +
+      '<button class="btn btn-ghost" onclick="toggleChanges()">Ask for changes</button>';
+}
+function undoApproval() {
+  undoQuickApproval(TASK.approvalId);
+}
+function completeTask() {
+  showToast('Task completed');
+  setState('Done', 'var(--green-11)');
+}
+function handOff() {
+  showToast('Handed off to assistant');
+  setState('Assistant working');
+}
+function toggleChanges() {
+  var row = document.getElementById('changes-row');
+  row.classList.toggle('open');
+  if (row.classList.contains('open')) document.getElementById('changes-input').focus();
+}
+function sendChanges() {
+  showToast('Change request sent to the assistant');
+  document.getElementById('changes-row').classList.remove('open');
+  document.getElementById('changes-input').value = '';
+  if (TASK.approvalId) {
+    NysaState.setRevision(TASK.approvalId, true);
+    showRevisionPending();
+  }
+}
+// D38, option B — stays in Needs-you, demoted with a "Revision requested"
+// label until a revised draft clears it (below); no group/count change.
+function showRevisionPending() {
+  var card = document.querySelector('.draft-card');
+  if (card) card.classList.add('revision-pending');
+  var buttons = document.querySelector('.draft-buttons');
+  if (buttons) buttons.innerHTML =
+    '<span class="revision-tag">Revision requested</span>' +
+    '<button class="btn btn-secondary btn-sm" onclick="clearRevision()">Revised draft ready</button>';
+  applyRevisionToListCard();
+}
+function clearRevision() {
+  if (TASK.approvalId) NysaState.setRevision(TASK.approvalId, false);
+  var card = document.querySelector('.draft-card');
+  if (card) card.classList.remove('revision-pending');
+  var buttons = document.querySelector('.draft-buttons');
+  if (buttons) buttons.innerHTML = draftButtonsHtml();
+  showToast('Revised draft ready — take another look');
+  applyRevisionToListCard();
+}
+function applyRevisionToListCard() {
+  if (!TASK.approvalId) return;
+  var card = document.querySelector('[data-approval-id="' + TASK.approvalId + '"]');
+  if (!card) return;
+  var revisionOn = NysaState.getRevision(TASK.approvalId);
+  card.classList.toggle('revision-pending', revisionOn);
+  var actions = card.querySelector('.needs-you-card-actions');
+  if (!actions) return;
+  if (revisionOn) {
+    actions.innerHTML = '<span class="revision-tag">Revision requested</span>';
+  } else if (NysaState.getApproval(TASK.approvalId) === 'approved') {
+    actions.innerHTML = '<span class="pill pill-green">Approved</span>';
+  } else {
+    actions.innerHTML =
+      '<span class="btn btn-iris btn-sm" onclick="event.preventDefault();event.stopPropagation();quickApprove(\'' + TASK.approvalId + '\')">Approve</span>' +
+      '<span class="btn btn-iris-outline btn-sm">Review</span>';
+  }
+}
+function dropTask() {
+  showToast('Task dropped');
+  setTimeout(function () { location.href = 'tasks.html'; }, 900);
+}
+function openTrace() {
+  document.getElementById('trace-scrim').hidden = false;
+  document.getElementById('trace-panel').hidden = false;
+}
+function closeTrace() {
+  document.getElementById('trace-scrim').hidden = true;
+  document.getElementById('trace-panel').hidden = true;
+}
+// Group headers collapse/expand their rows.
+document.querySelectorAll('.group-head').forEach(function (h) {
+  h.addEventListener('click', function () {
+    var body = h.nextElementSibling;
+    if (!body) return;
+    var hidden = body.style.display === 'none';
+    body.style.display = hidden ? '' : 'none';
+    h.querySelector('svg').style.transform = hidden ? '' : 'rotate(-90deg)';
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (TASK_ID !== 't1') buildThinShell();
+  applyStoredApprovalToDrawer();
+  NEEDS_YOU_IDS.forEach(function (id) {
+    if (NysaState.getApproval(id) === 'approved') moveToApprovedDone(id);
+  });
+  refreshBoardState();
+  if (!NysaState.isBriefDismissed()) document.getElementById('daily-brief').hidden = false;
+});
+</script>
+</body>
+</html>

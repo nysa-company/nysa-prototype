@@ -1,0 +1,99 @@
+/* Files screen — Figma 51:4064 (list) + 223:4045 (add-from-drive dialog) */
+
+.files-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-add-dropdown svg:last-child { margin-left: -2px; }
+
+/* Files table grid (R1-D1/R2-D10): Name / Origin / Filed to / Size / Updated / Extraction.
+   .files-tab and .file-row marker classes stay on the elements (no CSS backing) purely so
+   app.js's read-only data-source row filter keeps working — see files.html comment. */
+.cols-files { grid-template-columns: 340px 220px 135px 85px 155px 186px; }
+
+.file-name-cell { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.file-name-cell svg.file-icon { width: 20px; height: 20px; color: var(--muted-foreground); flex-shrink: 0; }
+.file-name-cell .file-name { font: 500 13px/1.3 var(--font-sans); color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-name-cell svg.lock-icon { width: 13px; height: 13px; color: var(--muted-foreground); flex-shrink: 0; }
+
+.file-origin-cell { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.file-origin-cell svg { width: 14px; height: 14px; color: var(--muted-foreground); flex-shrink: 0; }
+.file-origin-cell span { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.file-size-cell, .file-updated-cell { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
+.extraction-text { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
+
+/* Add-from-Drive dialog (files-add-drive.html) */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog {
+  width: 480px;
+  background: var(--background);
+  border-radius: var(--r-card);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 24px 16px;
+}
+.dialog-title { font: 600 16px/1.3 var(--font-sans); color: #000; margin: 0; }
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 24px;
+}
+.dialog-breadcrumb { font: 500 12px/1.3 var(--font-sans); color: #000; }
+
+.folder-tree {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.folder-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 6px;
+}
+.folder-row svg.folder-icon { width: 16px; height: 16px; color: var(--muted-foreground); flex-shrink: 0; }
+.folder-row span { font: 400 13px/1.3 var(--font-sans); color: #000; flex: 1; }
+.folder-row svg.chevron { width: 14px; height: 14px; color: var(--muted-foreground); flex-shrink: 0; }
+.folder-row.selected { background: #F0F2F4; padding-left: 28px; }
+.folder-row.selected span { font-weight: 500; }
+
+.routing-row { display: flex; align-items: center; gap: 8px; }
+.routing-row .routing-label { font: 400 13px/1.3 var(--font-sans); color: #000; }
+.project-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+}
+.project-dropdown span { font: 500 13px/1.3 var(--font-sans); color: #000; }
+.project-dropdown svg { width: 14px; height: 14px; color: var(--muted-foreground); flex-shrink: 0; }
+.routing-optional { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); }
+
+.dialog-helper { font: 400 12px/1.3 var(--font-sans); color: var(--muted-foreground); margin: 0; }
+
+.dialog-divider { height: 1px; background: var(--border); border: none; margin: 0; }
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px 24px;
+}

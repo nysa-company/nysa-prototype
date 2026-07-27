@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in — Nysa</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/tokens.css">
+  <style>
+    html, body { min-height: 100%; }
+    body {
+      color: #252525;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255, 255, 255, .8), transparent 38%),
+        repeating-linear-gradient(0deg, rgba(35, 35, 35, .018) 0, rgba(35, 35, 35, .018) 1px, transparent 1px, transparent 4px),
+        #eeeeee;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font-family: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: wait; opacity: .62; }
+    [hidden] { display: none !important; }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+    header {
+      position: absolute;
+      top: 34px;
+      left: 42px;
+    }
+    .brand {
+      width: fit-content;
+      color: #252525;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.055em;
+      text-decoration: none;
+    }
+    .main {
+      width: 100%;
+      display: grid;
+      place-items: center;
+    }
+    .login {
+      width: min(100%, 368px);
+      padding: 32px;
+      border: 1px solid #d2d2d2;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .95);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .9) inset, 0 18px 55px rgba(23, 23, 23, .1);
+    }
+    h1 {
+      margin: 0 0 26px;
+      font-size: 31px;
+      font-weight: 600;
+      line-height: 1.08;
+      letter-spacing: -.035em;
+      text-align: center;
+    }
+    .auth-button {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .google {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #252525;
+      background: #fff;
+      border: 1px solid #d0d0d0;
+      box-shadow: 0 1px 2px rgba(23, 23, 23, .05);
+      transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+    .google:hover:not(:disabled) {
+      background: #fff;
+      border-color: #999;
+      box-shadow: 0 3px 10px rgba(23, 23, 23, .1);
+    }
+    .google svg { width: 18px; height: 18px; flex: 0 0 18px; }
+    .email-toggle {
+      min-height: 44px;
+      display: flex;
+      margin: 8px auto 0;
+      align-items: center;
+      gap: 5px;
+      border: 0;
+      padding: 0 8px;
+      color: #6f6f6f;
+      background: transparent;
+      font-size: 13px;
+    }
+    .email-toggle:hover:not(:disabled) { color: #252525; }
+    .email-toggle svg { width: 14px; height: 14px; transition: transform 160ms ease; }
+    .email-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .email-form { padding-top: 17px; text-align: left; }
+    label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 500; }
+    input {
+      width: 100%;
+      height: 46px;
+      border: 1px solid #d0d0d0;
+      border-radius: 7px;
+      padding: 0 13px;
+      color: #252525;
+      background: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+    input::placeholder { color: #9c9c9c; }
+    input:hover { border-color: #999; }
+    input:focus { border-color: #5f5f5f; box-shadow: 0 0 0 3px rgba(23, 23, 23, .1); }
+    input[aria-invalid="true"] { border-color: var(--red-9); box-shadow: 0 0 0 3px rgba(220, 38, 38, .09); }
+    .error { min-height: 17px; margin: 6px 0 0; color: var(--red-9); font-size: 12px; line-height: 1.4; }
+    .continue { margin-top: 6px; color: #fff; background: #252525; border: 1px solid #252525; }
+    .continue:hover:not(:disabled) { background: #3b3b3b; }
+    .create { margin: 23px 0 0; color: #6f6f6f; text-align: center; font-size: 13px; }
+    .create button {
+      border: 0;
+      padding: 0;
+      color: #252525;
+      background: transparent;
+      font-size: inherit;
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .create button:hover { text-decoration-thickness: 2px; }
+    .status { margin: 9px 0 0; color: #6f6f6f; text-align: center; font-size: 12px; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid rgba(23, 23, 23, .2);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding: 64px 16px;
+      }
+      header { top: 22px; left: 20px; }
+      .brand { font-size: 22px; }
+      .login {
+        width: min(100%, 352px);
+        padding: 27px 22px 26px;
+        border-radius: 16px;
+      }
+      h1 { margin-bottom: 24px; font-size: 29px; }
+    }
+    @media (max-height: 650px) and (min-width: 481px) {
+      .page { padding-top: 84px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header><a class="brand" href="index.html" aria-label="Nysa prototype home">Nysa</a></header>
+    <main class="main">
+      <section class="login" aria-labelledby="sign-in-title" aria-busy="false">
+        <h1 id="sign-in-title">Welcome back</h1>
+        <p style="margin:6px 0 18px;font-size:13px;color:#6b6b6b;">Clickable prototype with sample data — press “Continue with Google” to explore.</p>
+
+        <button class="auth-button google" id="google-sign-in" type="button">
+          <svg viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+            <path fill="#4285F4" d="M17.64 9.205c0-.638-.057-1.252-.164-1.841H9v3.482h4.844a4.14 4.14 0 0 1-1.797 2.716v2.258h2.909c1.702-1.567 2.684-3.874 2.684-6.615Z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.468-.806 5.956-2.18l-2.909-2.258c-.806.54-1.836.859-3.047.859-2.344 0-4.328-1.585-5.037-3.714H.956v2.332A9 9 0 0 0 9 18Z"/>
+            <path fill="#FBBC05" d="M3.963 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.281-1.707V4.961H.956A9 9 0 0 0 0 9c0 1.452.347 2.827.956 4.039l3.007-2.332Z"/>
+            <path fill="#EA4335" d="M9 3.58c1.322 0 2.508.455 3.442 1.346l2.58-2.58C13.464.892 11.43 0 9 0A9 9 0 0 0 .956 4.961l3.007 2.332C4.672 5.165 6.656 3.58 9 3.58Z"/>
+          </svg>
+          <span class="button-label">Continue with Google</span>
+        </button>
+
+        <button class="email-toggle" id="email-toggle" type="button" aria-expanded="false" aria-controls="email-region">
+          <span class="toggle-label">Use email instead</span>
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div id="email-region" hidden>
+          <form class="email-form" id="email-sign-in" novalidate>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required aria-describedby="email-error">
+            <p class="error" id="email-error" aria-live="polite"></p>
+            <button class="auth-button continue" id="email-submit" type="submit"><span class="button-label">Continue with email</span></button>
+          </form>
+        </div>
+
+        <p class="create">New to Nysa? <button id="create-account" type="button">Create account</button></p>
+        <p class="status" id="status" aria-live="polite" hidden></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var login = document.querySelector('.login');
+      var google = document.querySelector('#google-sign-in');
+      var toggle = document.querySelector('#email-toggle');
+      var region = document.querySelector('#email-region');
+      var form = document.querySelector('#email-sign-in');
+      var email = document.querySelector('#email');
+      var emailSubmit = document.querySelector('#email-submit');
+      var error = document.querySelector('#email-error');
+      var create = document.querySelector('#create-account');
+      var status = document.querySelector('#status');
+      var busy = false;
+
+      // Sign-in always goes straight to My board (Javier, Jul 10) — the
+      // onboarding flow is entered only via "Create account" or the hub link.
+      var OB_KEY = 'nysa-onboarding-state-v1';
+
+      function go(button, target) {
+        if (busy) return;
+        busy = true;
+        login.setAttribute('aria-busy', 'true');
+        google.disabled = true;
+        toggle.disabled = true;
+        email.disabled = true;
+        emailSubmit.disabled = true;
+        create.disabled = true;
+        button.querySelector('.button-label').textContent = 'Signing in…';
+        window.setTimeout(function () { location.href = target; }, 450);
+      }
+
+      toggle.addEventListener('click', function () {
+        var open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        region.hidden = !open;
+        toggle.querySelector('.toggle-label').textContent = open ? 'Hide email' : 'Use email instead';
+        if (open) email.focus();
+      });
+      google.addEventListener('click', function () {
+        // Google establishes identity only; the simulated account is the
+        // canonical javier@kredi.mx. Gmail/Calendar stay separate grants.
+        go(google, 'tasks.html');
+      });
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (busy) return;
+        if (!email.checkValidity()) {
+          email.setAttribute('aria-invalid', 'true');
+          error.textContent = 'Enter a valid email address.';
+          email.focus();
+          return;
+        }
+        go(emailSubmit, 'tasks.html');
+      });
+      email.addEventListener('input', function () {
+        if (email.getAttribute('aria-invalid') !== 'true') return;
+        email.removeAttribute('aria-invalid');
+        error.textContent = '';
+      });
+      create.addEventListener('click', function () {
+        if (busy) return;
+        // Create account restarts onboarding from a clean state.
+        try { localStorage.removeItem(OB_KEY); } catch (e) {}
+        try { localStorage.setItem(OB_KEY, JSON.stringify({ method: 'create' })); } catch (e) {}
+        busy = true;
+        login.setAttribute('aria-busy', 'true');
+        google.disabled = true;
+        toggle.disabled = true;
+        email.disabled = true;
+        emailSubmit.disabled = true;
+        create.disabled = true;
+        status.hidden = false;
+        status.textContent = 'Starting setup…';
+        window.setTimeout(function () { location.href = '2026-07-10-onboarding.html'; }, 450);
+      });
+    })();
+  </script>
+</body>
+</html>

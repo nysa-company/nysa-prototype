@@ -1,0 +1,67 @@
+/* Knowledge screens — index list, detail drawer, review drawer.
+   Figma frames 51:2914 / 271:3056 / 278:3166. */
+
+.k-trust-summary { font: 400 13px/1.4 var(--font-sans); color: var(--muted-foreground); }
+.k-trust-summary .amber { color: var(--amber-11); text-decoration: none; }
+.k-trust-summary a.amber:hover { text-decoration: underline; }
+/* D37, option B — "1 stale" (amber, above) and "1 unreviewed" (Candidate)
+   are now two separate counts/links instead of one bundled "2 need review". */
+.k-trust-summary a:not(.amber) { color: var(--muted-foreground); text-decoration: underline; text-decoration-color: var(--border); }
+.k-trust-summary a:not(.amber):hover { color: #000; text-decoration-color: currentColor; }
+
+/* Card anatomy — outer .card-list/.card are shared; inner rows stay page-local */
+.k-row-top { display: flex; align-items: center; gap: 10px; }
+.k-row-title { font: 600 14px/1.3 var(--font-sans); color: #000; flex: 1; min-width: 0; }
+.k-row-desc { font: 400 13px/1.5 var(--font-sans); color: #000; margin-top: 8px; }
+.k-row-prov { font: 400 10px/1.4 var(--font-mono); color: var(--muted-foreground); display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.k-row-prov .amber { color: var(--amber-11); }
+
+.pill-auto svg { width: 10px; height: 10px; }
+
+/* Meta rows */
+.k-meta { display: flex; flex-direction: column; gap: 6px; }
+.k-meta-row { display: flex; align-items: center; gap: 12px; min-height: 20px; }
+.k-meta-label { width: 96px; flex-shrink: 0; font: 400 13px/1.3 var(--font-sans); color: var(--muted-foreground); }
+.k-meta-value { font: 400 13px/1.3 var(--font-sans); color: var(--muted-foreground); }
+.k-meta-value.amber { color: var(--amber-11); }
+/* D50, option A — Confidence meta row: value at weight 500, the trailing
+   percentage muted, plain sibling row (no highlight — existing meta rows
+   have none, so Confidence doesn't invent one). */
+.k-meta-value.confidence { font-weight: 500; color: var(--foreground); }
+.k-meta-value.confidence .pct { color: var(--muted-foreground); font-weight: 400; }
+.pill-tag { background: #F0F2F4; color: #000; }
+
+/* Connection rows */
+.k-connections { display: flex; flex-direction: column; gap: 16px; }
+.k-group { display: flex; flex-direction: column; gap: 8px; }
+.k-conn-rows { display: flex; flex-direction: column; gap: 8px; }
+.k-conn-row { display: flex; align-items: flex-start; gap: 10px; }
+.k-conn-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted-foreground); margin-top: 8px; flex-shrink: 0; }
+.k-conn-text { display: flex; flex-direction: column; gap: 2px; }
+.k-conn-row .k-conn-main { font: 400 13px/1.3 var(--font-sans); color: #000; }
+.k-conn-row .k-conn-sub { font: 400 10px/1.4 var(--font-mono); color: var(--muted-foreground); }
+.k-conn-row .k-conn-main .amber { color: var(--amber-11); }
+.k-conn-row .k-conn-main a { color: var(--iris-11); text-decoration: none; }
+.k-conn-row .k-conn-main a:hover { text-decoration: underline; }
+
+/* Footer — spacing-only, no divider (canon) */
+.k-panel-footer { display: flex; align-items: center; gap: 12px; }
+.k-footer-link { font: 500 12px/1 var(--font-sans); color: #000; text-decoration: none; }
+.k-footer-link:hover { text-decoration: underline; }
+.k-footer-link.iris { color: var(--iris-11); }
+.k-footer-dot { color: var(--muted-foreground); font-size: 12px; }
+.k-footer-spacer { flex: 1; }
+.k-footer-archive { font: 500 12px/1 var(--font-sans); color: var(--red-9); text-decoration: none; }
+.k-footer-archive:hover { text-decoration: underline; }
+.k-also-on { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); }
+
+/* Needs-review block + proposed update (review drawer only) */
+.k-review-block { background: var(--amber-3); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.k-review-label { font: 500 11px/1.4 var(--font-sans); text-transform: uppercase; letter-spacing: .04em; color: var(--amber-11); }
+.k-review-line { font: 400 13px/1.5 var(--font-sans); color: #000; }
+
+.k-proposed { display: flex; flex-direction: column; gap: 8px; }
+.k-proposed-box { background: var(--muted); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+.k-proposed-old { font: 400 13px/1.3 var(--font-sans); color: var(--muted-foreground); text-decoration: line-through; }
+.k-proposed-new { font: 500 13px/1.3 var(--font-sans); color: #000; }
+.k-proposed-source { font: 400 12px/1.4 var(--font-mono); color: var(--muted-foreground); }

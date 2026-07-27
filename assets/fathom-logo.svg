@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="fathom-logo-title">
+  <title id="fathom-logo-title">Fathom</title>
+  <rect width="100" height="100" rx="20" fill="#E8F2FE"/>
+  <rect x="30" y="26" width="13" height="48" rx="4" fill="#2F6FEC"/>
+  <path d="M43 26h26a4 4 0 0 1 3 6.6L58 48H43V26z" fill="#2F6FEC"/>
+  <path d="M43 46h20a4 4 0 0 1 3 6.6L52 66H43V46z" fill="#2F6FEC"/>
+</svg>
