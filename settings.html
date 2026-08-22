@@ -78,17 +78,10 @@
   .section-actions { margin-top: 20px; }
 
   /* Members & invitations (workspace admin invites) — page-local layout only. */
-  .settings-subhead {
-    display: flex; align-items: center; gap: 8px;
-    margin: 32px 0 2px; padding-top: 4px;
-  }
-  .settings-subhead-title { font: 600 13px/1.3 var(--font-sans); }
-  .settings-subhead-note { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); margin: 0 0 6px; }
-  .settings-subhead .btn { margin-left: auto; }
+  .settings-subhead { display: flex; align-items: flex-start; gap: 16px; }
+  .settings-subhead .btn { margin-left: auto; flex-shrink: 0; margin-top: 2px; }
   .you-tag { font: 400 11px/1 var(--font-sans); color: var(--muted-foreground); }
-  .invite-link { font: 400 12px/1.4 var(--font-mono); color: var(--foreground); margin-top: 3px; word-break: break-all; }
   .member-row .row-menu { margin-left: -4px; }
-  .member-row:has(+ .settings-subhead) { border-bottom: none; }
 </style>
 </head>
 <body>
@@ -101,7 +94,7 @@
     </a>
     <div class="settings-nav-group">
       <div class="settings-nav-label">Workspace</div>
-      <div class="settings-item" data-section="members">Members</div>
+      <div class="settings-item" data-section="invites">Invitations</div>
       <div class="settings-item" data-section="connections">Connections &amp; health</div>
       <div class="settings-item" data-section="autonomy">Autonomy</div>
       <div class="settings-item" data-section="recording">Recording &amp; privacy</div>
@@ -116,73 +109,22 @@
 
   <div class="settings-panel">
 
-    <!-- Members & invitations — workspace roster, pending invites, join rules -->
-    <div class="sec" id="sec-members">
-      <h2>Members</h2>
-      <p class="sub">Everyone with access to the <span data-ws-name>Kredi</span> workspace.<span data-workspace="kredi handypass"> Owners and admins can invite people and change roles — members can't.</span></p>
-
-      <div class="member-row">
-        <div class="member-avatar">JA</div>
-        <div class="row-text">
-          <div class="member-name">Javier Aldape <span class="you-tag">you</span></div>
-          <div class="member-sub">javier@kredi.mx · active now</div>
+    <!-- Invitations — pending invites plus the invite action -->
+    <div class="sec" id="sec-invites">
+      <div class="settings-subhead">
+        <div>
+          <h2>Invitations</h2>
+          <p class="sub">People invited to <span data-ws-name>Kredi</span> who haven't joined yet. Invitations expire after 7 days, and the delivery result shows up on the row.</p>
         </div>
-        <span class="pill pill-gray">Owner</span>
-        <span class="row-menu">
-          <button class="icon-btn" data-menu aria-label="Member actions" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-          <div class="menu-popover">
-            <div class="menu-item" data-toast="Not in this prototype yet">Transfer ownership</div>
-          </div>
-        </span>
+        <button type="button" class="btn btn-iris btn-sm" onclick="document.getElementById('invite-overlay').hidden=false">Invite teammates</button>
       </div>
 
       <div data-workspace="kredi">
         <div class="member-row">
-          <div class="member-avatar">RS</div>
-          <div class="row-text">
-            <div class="member-name">Renata Solís</div>
-            <div class="member-sub">renata@kredi.mx · active 2h ago</div>
-          </div>
-          <span class="pill pill-outline">Admin</span>
-          <span class="row-menu">
-            <button class="icon-btn" data-menu aria-label="Member actions" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-            <div class="menu-popover">
-              <div class="menu-item" data-toast="Renata is now a Member">Change to Member</div>
-              <div class="menu-separator"></div>
-              <div class="menu-item danger" data-toast="Renata removed from Kredi">Remove from workspace</div>
-            </div>
-          </span>
-        </div>
-
-        <div class="member-row">
-          <div class="member-avatar">DP</div>
-          <div class="row-text">
-            <div class="member-name">Diego Palafox</div>
-            <div class="member-sub">diego@kredi.mx · active yesterday</div>
-          </div>
-          <span class="pill pill-outline">Member</span>
-          <span class="row-menu">
-            <button class="icon-btn" data-menu aria-label="Member actions" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-            <div class="menu-popover">
-              <div class="menu-item" data-toast="Diego is now an Admin">Change to Admin</div>
-              <div class="menu-separator"></div>
-              <div class="menu-item danger" data-toast="Diego removed from Kredi">Remove from workspace</div>
-            </div>
-          </span>
-        </div>
-
-        <div class="settings-subhead">
-          <div class="settings-subhead-title">Pending invitations</div>
-          <span class="pill pill-outline">3</span>
-          <button type="button" class="btn btn-secondary btn-sm" data-toast="2 invitations resent — tomas@bancora.mx needs a valid address">Resend all</button>
-        </div>
-        <p class="settings-subhead-note">Invitations expire after 7 days. If an email doesn't reach someone, the delivery result shows up on their row.</p>
-
-        <div class="member-row">
           <div class="member-avatar">L</div>
           <div class="row-text">
             <div class="member-name">lucia@kredi.mx</div>
-            <div class="member-sub">Member · invited by you · 2 days ago</div>
+            <div class="member-sub">Member &middot; invited by you &middot; 2 days ago</div>
           </div>
           <span class="pill pill-outline">Invited</span>
           <span class="row-menu">
@@ -200,7 +142,7 @@
           <div class="member-avatar">T</div>
           <div class="row-text">
             <div class="member-name">tomas@bancora.mx</div>
-            <div class="member-sub">Member · invited by Renata · 5 days ago · mailbox not found</div>
+            <div class="member-sub">Member &middot; invited by Renata &middot; 5 days ago &middot; mailbox not found</div>
           </div>
           <span class="pill pill-red">Bounced</span>
           <span class="row-menu">
@@ -218,7 +160,7 @@
           <div class="member-avatar">P</div>
           <div class="row-text">
             <div class="member-name">pablo@kredi.mx</div>
-            <div class="member-sub">Admin · invited by you · 9 days ago · never opened</div>
+            <div class="member-sub">Admin &middot; invited by you &middot; 9 days ago &middot; never opened</div>
           </div>
           <span class="pill pill-amber">Expired</span>
           <span class="row-menu">
@@ -231,35 +173,12 @@
             </div>
           </span>
         </div>
-
-        <div class="settings-subhead">
-          <div class="settings-subhead-title">Who can join</div>
-        </div>
-        <div class="toggle-row">
-          <div class="row-text">
-            <div class="toggle-name">Anyone with a @kredi.mx email</div>
-            <div class="toggle-sub">Joins as a Member without an invitation. Turn off to require an invite for everyone.</div>
-          </div>
-          <div class="switch on" onclick="this.classList.toggle('on')"></div>
-        </div>
-        <div class="toggle-row">
-          <div class="row-text">
-            <div class="toggle-name">Invite link</div>
-            <div class="invite-link">app.usenysa.com/join/kredi-8f2a41</div>
-            <div class="toggle-sub">Anyone with the link joins as a Member. Expires in 7 days.</div>
-          </div>
-          <button type="button" class="btn btn-secondary btn-sm" data-toast="Invite link copied">Copy link</button>
-        </div>
       </div>
 
       <div class="list-empty" data-workspace="personal handypass">
         <svg class="list-empty-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-        <div class="list-empty-line1">It's just you in <span data-ws-name>this workspace</span></div>
-        <div class="list-empty-line2">Invite someone and they'll see the projects, meetings, and knowledge you share here.</div>
-      </div>
-
-      <div class="section-actions">
-        <button type="button" class="btn btn-iris btn-sm" onclick="document.getElementById('invite-overlay').hidden=false">Invite member</button>
+        <div class="list-empty-line1">No pending invitations</div>
+        <div class="list-empty-line2">Invite someone and they'll show up here until they join.</div>
       </div>
     </div>
 
@@ -476,7 +395,7 @@
     var items = document.querySelectorAll('.settings-item');
     var sections = document.querySelectorAll('.sec');
     function show(id) {
-      if (!document.getElementById('sec-' + id)) id = 'members';
+      if (!document.getElementById('sec-' + id)) id = 'invites';
       items.forEach(function (i) { i.classList.toggle('active', i.getAttribute('data-section') === id); });
       sections.forEach(function (s) { s.classList.toggle('active', s.id === 'sec-' + id); });
     }
@@ -488,9 +407,9 @@
       });
     });
     window.addEventListener('hashchange', function () {
-      show(location.hash.replace('#', '') || 'members');
+      show(location.hash.replace('#', '') || 'invites');
     });
-    show(location.hash.replace('#', '') || 'members');
+    show(location.hash.replace('#', '') || 'invites');
   })();
 </script>
 </body>
