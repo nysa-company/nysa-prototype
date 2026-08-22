@@ -81,7 +81,20 @@
   .settings-subhead { display: flex; align-items: flex-start; gap: 16px; }
   .settings-subhead .btn { margin-left: auto; flex-shrink: 0; margin-top: 2px; }
   .you-tag { font: 400 11px/1 var(--font-sans); color: var(--muted-foreground); }
-  .member-row .row-menu { margin-left: -4px; }
+
+  /* Invitations table — email, expiry, status, resend (mirrors the live model). */
+  .cols-invites { grid-template-columns: 1fr 110px 90px 150px; }
+  .settings-panel .sec.wide { max-width: 780px; }
+  .invite-cell-email { font: 500 13px/1.3 var(--font-sans); overflow: hidden; text-overflow: ellipsis; }
+  .invite-cell-date { font: 400 12px/1.4 var(--font-mono); color: var(--muted-foreground); }
+  .invite-cell-action { justify-self: end; text-align: right; }
+  .invite-cooldown { font: 400 11px/1.4 var(--font-sans); color: var(--muted-foreground); }
+  .table-row.cols-invites { min-height: 48px; }
+
+  /* Invite dialog: one input per teammate, add rows as needed. */
+  .invite-rows { display: flex; flex-direction: column; gap: 8px; }
+  .invite-rows input { height: 32px; border: 1px solid var(--border); border-radius: var(--r-control); padding: 0 10px; font: 400 13px/1.4 var(--font-sans); background: var(--background); }
+  #invite-add { align-self: flex-start; }
 </style>
 </head>
 <body>
@@ -110,68 +123,39 @@
   <div class="settings-panel">
 
     <!-- Invitations — pending invites plus the invite action -->
-    <div class="sec" id="sec-invites">
+    <div class="sec wide" id="sec-invites">
       <div class="settings-subhead">
         <div>
           <h2>Invitations</h2>
-          <p class="sub">People invited to <span data-ws-name>Kredi</span> who haven't joined yet. Invitations expire after 7 days, and the delivery result shows up on the row.</p>
+          <p class="sub">People invited to <span data-ws-name>Kredi</span> who haven't joined yet. Invitations expire 14 days after they're sent.</p>
         </div>
         <button type="button" class="btn btn-iris btn-sm" onclick="document.getElementById('invite-overlay').hidden=false">Invite teammates</button>
       </div>
 
       <div data-workspace="kredi">
-        <div class="member-row">
-          <div class="member-avatar">L</div>
-          <div class="row-text">
-            <div class="member-name">lucia@kredi.mx</div>
-            <div class="member-sub">Member &middot; invited by you &middot; 2 days ago</div>
-          </div>
-          <span class="pill pill-outline">Invited</span>
-          <span class="row-menu">
-            <button class="icon-btn" data-menu aria-label="Invitation actions" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-            <div class="menu-popover">
-              <div class="menu-item" data-toast="Invitation resent to lucia@kredi.mx">Resend invitation</div>
-              <div class="menu-item" data-toast="Invite link copied">Copy invite link</div>
-              <div class="menu-separator"></div>
-              <div class="menu-item danger" data-toast="Invitation revoked">Revoke invitation</div>
-            </div>
-          </span>
+        <div class="table-head cols-invites">
+          <span>Email</span>
+          <span>Expires</span>
+          <span>Status</span>
+          <span class="invite-cell-action">Resend</span>
         </div>
-
-        <div class="member-row">
-          <div class="member-avatar">T</div>
-          <div class="row-text">
-            <div class="member-name">tomas@bancora.mx</div>
-            <div class="member-sub">Member &middot; invited by Renata &middot; 5 days ago &middot; mailbox not found</div>
-          </div>
-          <span class="pill pill-red">Bounced</span>
-          <span class="row-menu">
-            <button class="icon-btn" data-menu aria-label="Invitation actions" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-            <div class="menu-popover">
-              <div class="menu-item" data-toast="Not in this prototype yet">Fix address and resend</div>
-              <div class="menu-item" data-toast="Invite link copied">Copy invite link</div>
-              <div class="menu-separator"></div>
-              <div class="menu-item danger" data-toast="Invitation revoked">Revoke invitation</div>
-            </div>
-          </span>
+        <div class="table-row cols-invites">
+          <span class="invite-cell-email">lucia@kredi.mx</span>
+          <span class="invite-cell-date">Sep 5, 2026</span>
+          <span><span class="pill pill-outline">Queued</span></span>
+          <span class="invite-cell-action"><span class="invite-cooldown">Available after Aug 23</span></span>
         </div>
-
-        <div class="member-row">
-          <div class="member-avatar">P</div>
-          <div class="row-text">
-            <div class="member-name">pablo@kredi.mx</div>
-            <div class="member-sub">Admin &middot; invited by you &middot; 9 days ago &middot; never opened</div>
-          </div>
-          <span class="pill pill-amber">Expired</span>
-          <span class="row-menu">
-            <button class="icon-btn" data-menu aria-label="Invitation actions" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
-            <div class="menu-popover">
-              <div class="menu-item" data-toast="Invitation resent to pablo@kredi.mx">Resend invitation</div>
-              <div class="menu-item" data-toast="Invite link copied">Copy invite link</div>
-              <div class="menu-separator"></div>
-              <div class="menu-item danger" data-toast="Invitation revoked">Revoke invitation</div>
-            </div>
-          </span>
+        <div class="table-row cols-invites">
+          <span class="invite-cell-email">tomas@bancora.mx</span>
+          <span class="invite-cell-date">Sep 3, 2026</span>
+          <span><span class="pill pill-red">Bounced</span></span>
+          <span class="invite-cell-action"><button type="button" class="btn btn-secondary btn-sm" data-toast="Invitation sent again to tomas@bancora.mx">Send again</button></span>
+        </div>
+        <div class="table-row cols-invites">
+          <span class="invite-cell-email">pablo@kredi.mx</span>
+          <span class="invite-cell-date">Aug 8, 2026</span>
+          <span><span class="pill pill-amber">Expired</span></span>
+          <span class="invite-cell-action"><button type="button" class="btn btn-secondary btn-sm" data-toast="Invitation sent again to pablo@kredi.mx">Send again</button></span>
         </div>
       </div>
 
@@ -349,20 +333,13 @@
       <h2 class="create-dialog-title">Invite to <span data-ws-name>Kredi</span></h2>
       <div class="create-fields">
         <div class="create-field">
-          <label for="invite-emails">Email addresses</label>
-          <textarea id="invite-emails" rows="3" placeholder="lucia@kredi.mx, pablo@kredi.mx"></textarea>
-          <div class="member-sub">Separate several with a comma or a new line.</div>
-        </div>
-        <div class="create-field">
-          <label for="invite-role">Role</label>
-          <select id="invite-role">
-            <option selected>Member — sees shared work, can't invite</option>
-            <option>Admin — can invite people and change roles</option>
-          </select>
-        </div>
-        <div class="create-field">
-          <label for="invite-note">Note <span class="you-tag">optional</span></label>
-          <textarea id="invite-note" rows="2" placeholder="Added you to our Nysa workspace — everything on Bancora lives here."></textarea>
+          <label>Teammate emails</label>
+          <div class="invite-rows" id="invite-rows">
+            <input type="email" placeholder="Teammate 1 email">
+            <input type="email" placeholder="Teammate 2 email">
+            <input type="email" placeholder="Teammate 3 email">
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="invite-add">Add another</button>
         </div>
       </div>
       <div class="create-dialog-actions">
@@ -385,6 +362,16 @@
     // Same lookup names the workspace everywhere the Members copy mentions it.
     document.querySelectorAll('[data-ws-name]').forEach(function (el) {
       el.textContent = names[ws] || 'Kredi';
+    });
+
+    // "Add another" appends one more email input.
+    var rows = document.getElementById('invite-rows');
+    document.getElementById('invite-add').addEventListener('click', function () {
+      var input = document.createElement('input');
+      input.type = 'email';
+      input.placeholder = 'Teammate ' + (rows.children.length + 1) + ' email';
+      rows.appendChild(input);
+      input.focus();
     });
 
     // Escape closes the invite dialog (app.js only handles it for menus).
