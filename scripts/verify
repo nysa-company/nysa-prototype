@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  npm test
+else
+  exit 75
+fi
