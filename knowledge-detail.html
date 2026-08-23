@@ -3,34 +3,77 @@
 <head>
   <meta name="robots" content="noindex">
 <meta charset="UTF-8">
-<title>Knowledge — Detail — NYSA</title>
+<title>Mortgage underwriting macro process — Knowledge — NYSA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/tokens.css">
 <link rel="stylesheet" href="assets/components.css">
 <link rel="stylesheet" href="assets/knowledge.css">
+<link rel="stylesheet" href="assets/meetings.css">
 <style>
+  /* Document, full width. Header/breadcrumb reuse the exact global .crumb
+     and .detail-header/.detail-title-col components (assets/meetings.css
+     is linked so those classes carry their flex layout). Title uses plain
+     .t-page-title so it matches the meeting detail page exactly. The meta
+     line is a tight labeled group (Type / Verified by or Decided by /
+     Owner) instead of one comma-separated sentence. Trust state stays out
+     of the header, in the colored chip on the document card's toolbar;
+     secondary actions (View history, Archive) live in the "..." menu,
+     reusing the existing .row-menu/.menu-popover pattern. */
+  .doc-header-v2 { align-items: center; }
+
+  .doc-meta-group { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .doc-meta-item { display: flex; align-items: baseline; gap: 5px; }
+  .doc-meta-label { font: 500 11px/1.2 var(--font-sans); text-transform: uppercase; letter-spacing: .04em; color: var(--muted-foreground); }
+  .doc-meta-value { font: 400 13px/1.3 var(--font-sans); color: var(--foreground); }
+  .doc-meta-sep { width: 1px; height: 12px; background: var(--border); flex-shrink: 0; }
+
+  .doc-header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .doc-body { display: flex; align-items: flex-start; gap: 40px; }
+
+  /* Flat card — clean 1px border, no shadow. Horizontal padding matches
+     the relation cards' 16px so the card doesn't look over-padded next to
+     them. Toolbar: trust-state chip, "last edited" label, and the pencil
+     all cluster together on the right instead of the chip sitting alone
+     on the left. */
+  .doc-paper { position: relative; flex: 1; min-width: 0; background: #fff; border: 1px solid var(--border); border-radius: var(--r-card); box-shadow: none; padding: 48px 56px; }
+  .doc-toolbar { display: flex; align-items: center; justify-content: space-between; margin: -48px -56px 24px; padding: 14px 56px; border-bottom: 1px solid var(--border); }
+  .doc-toolbar-right { display: flex; align-items: center; gap: 10px; }
+  .doc-toolbar-label { font: 400 12px/1.4 var(--font-sans); color: var(--muted-foreground); }
+  .doc-section { margin-bottom: 28px; }
+  .doc-section:last-child { margin-bottom: 0; }
+  .doc-section-h { font: 600 15px/1.4 var(--font-sans); color: var(--foreground); margin: 0 0 8px; }
+  .doc-section-body { font: 400 14px/1.7 var(--font-sans); color: var(--foreground); margin: 0; }
+
+  /* Relation cards — same nesting as the "Captured: ..." strip on the
+     meeting page (.capture-strip/.capture-header/.capture-divider in
+     assets/meetings.css): the card itself carries no padding, so the
+     divider between the title and the list runs edge-to-edge instead of
+     being inset by the card's own padding. Rows carry a trailing arrow
+     instead of a leading bullet. */
+  .doc-rail { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; position: sticky; top: 32px; }
+  .rel-card { border: 1px solid var(--border); border-radius: 10px; background: #fff; overflow: hidden; }
+  .rel-card-head { padding: 14px 16px; }
+  .rel-card-title { font: 600 13px/1.3 var(--font-sans); color: #000; }
+  .rel-card-divider { border-top: 1px solid var(--border); }
+  .rel-list { display: flex; flex-direction: column; padding: 4px 0; }
+  .rel-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--border); text-decoration: none; }
+  .rel-item:last-child { border-bottom: none; }
+  .rel-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .rel-item .arrow-link { width: 13px; height: 13px; color: var(--muted-foreground); flex-shrink: 0; }
+  .rel-item-main { font: 400 13px/1.35 var(--font-sans); color: #000; }
+  .rel-item .rel-item-sub { font: 400 10px/1.4 var(--font-mono); color: var(--muted-foreground); text-decoration: none; }
+  .rel-list .rel-empty { padding: 10px 16px 14px; display: block; }
+
   /* Archive confirmation dialog — inline-JS overlay, pattern from companies-selected.
      .modal-overlay is shared (components.css); only the inner .dialog is page-local. */
-  .dialog {
-    width: 340px;
-    background: #fff;
-    border-radius: 10px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+  .dialog { width: 340px; background: #fff; border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
   .dialog-body { display: flex; flex-direction: column; gap: 8px; }
   .dialog-title { font: 600 16px/1.2 var(--font-sans); color: #000; margin: 0; }
   .dialog-text { font: 400 13px/1.5 var(--font-sans); color: var(--muted-foreground); margin: 0; }
   .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
   .btn-danger { background: var(--red-9); color: #fff; }
-  /* Trust metadata (spec v0.8) — Source / Verified by / Decided by rows reuse
-     the existing .k-meta-row anatomy; only the link color is page-local. */
-  .k-meta-value a { color: var(--iris-11); text-decoration: none; }
-  .k-meta-value a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -157,217 +200,108 @@
 
   <div class="main">
     <div class="page-wrap">
-      <div class="page-head">
-        <div>
-          <h1 class="t-page-title">Knowledge</h1>
-          <p class="page-sub">Everything the company knows — captured and maintained automatically.</p>
-        </div>
-      </div>
-
-      <div class="k-trust-summary">7 pieces · 5 verified · <a class="amber" href="knowledge-review.html?id=expediente-check">1 stale</a> · <a href="knowledge-review.html?id=refund-workaround">1 unreviewed</a></div>
-
-      <div class="toolbar">
-        <a class="filter-chip active" href="#" data-filter="all">All</a>
-        <a class="filter-chip" href="#" data-filter="Macro process">Macro process</a>
-        <a class="filter-chip" href="#" data-filter="Functional process">Functional process</a>
-        <a class="filter-chip" href="#" data-filter="Policies">Policies</a>
-        <a class="filter-chip" href="#" data-filter="Manuals">Manuals</a>
-        <a class="filter-chip" href="#" data-filter="Controls">Controls</a>
-        <a class="filter-chip" href="#" data-filter="Rituals">Rituals</a>
-        <a class="filter-chip" href="#" data-filter="Tools">Tools</a>
-        <a class="filter-chip" href="#" data-filter="Decisions">Decisions</a>
-      </div>
-
-      <div class="card-list">
-
-        <a class="card active" href="knowledge-detail.html?id=mortgage-macro" data-category="Macro process">
-          <div class="k-row-top">
-            <div class="k-row-title">Mortgage underwriting macro process</div>
-            <span class="pill pill-gray">Macro process</span>
-            <span class="pill pill-gray">Verified</span>
-          </div>
-          <div class="k-row-desc">End-to-end stages from application intake through funding, with handoffs between teams.</div>
-          <div class="k-row-prov">Filed by Javier · manual entry  ·  Updated Jun 20</div>
-        </a>
-
-        <a class="card" href="knowledge-detail.html?id=databsharing-checklist" data-category="Controls">
-          <div class="k-row-top">
-            <div class="k-row-title">Data-sharing redline review checklist</div>
-            <span class="pill pill-gray">Controls</span>
-            <span class="pill pill-gray">Verified</span>
-          </div>
-          <div class="k-row-desc">Standard checklist for reviewing data-sharing clauses in partner redlines before they go back to legal.</div>
-          <div class="k-row-prov">
-            <span class="pill pill-gray pill-muted-text pill-auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.964L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>Auto</span>
-            Auto-filed · from Bancora sync — Jul 6  ·  Updated Jul 6
-          </div>
-        </a>
-
-        <a class="card" href="knowledge-detail.html?id=weekly-partner-ritual" data-category="Rituals">
-          <div class="k-row-top">
-            <div class="k-row-title">Weekly partner sync ritual</div>
-            <span class="pill pill-gray">Rituals</span>
-            <span class="pill pill-gray">Verified</span>
-          </div>
-          <div class="k-row-desc">Cadence and agenda template for recurring partner check-ins (Bancora, Altiva).</div>
-          <div class="k-row-prov">Runs as: meeting series (Mon 9:00) + automation: pre-meeting digest · Updated Jul 2</div>
-        </a>
-
-        <a class="card" href="knowledge-detail.html?id=loan-file-manual" data-category="Manuals">
-          <div class="k-row-top">
-            <div class="k-row-title">Loan file completeness checklist ("expediente completo")</div>
-            <span class="pill pill-gray">Manuals</span>
-            <span class="pill pill-gray">Verified</span>
-          </div>
-          <div class="k-row-desc">Required documents for a mortgage file to be considered complete before underwriting review.</div>
-          <div class="k-row-prov">Filed by Javier · manual entry  ·  Updated Jun 28</div>
-        </a>
-
-        <a class="card" href="knowledge-detail.html?id=jul6-decision" data-category="Decisions">
-          <div class="k-row-top">
-            <div class="k-row-title">Jul 6 — Proceed with Bancora co-branded pilot</div>
-            <span class="pill pill-gray">Decisions</span>
-            <span class="pill pill-gray">Verified</span>
-          </div>
-          <div class="k-row-desc">Marco and Ana confirmed intent to move the integration forward this quarter; proposal targeted for Friday Jul 10.</div>
-          <div class="k-row-prov">
-            <span class="pill pill-gray pill-muted-text pill-auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.964L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>Auto</span>
-            Auto-filed · from Bancora sync — Jul 6
-          </div>
-        </a>
-
-        <a class="card" href="knowledge-review.html?id=expediente-check" data-category="Controls">
-          <div class="k-row-top">
-            <div class="k-row-title">Expediente completo check</div>
-            <span class="pill pill-gray">Controls</span>
-            <span class="pill pill-amber">Stale</span>
-          </div>
-          <div class="k-row-desc">Daily check that new loan files meet the completeness checklist before underwriting review.</div>
-          <div class="k-row-prov">Last verified May 5 ·  <span class="amber">past the 60-day window</span></div>
-        </a>
-
-        <a class="card" href="knowledge-review.html?id=refund-workaround" data-category="Manuals">
-          <div class="k-row-top">
-            <div class="k-row-title">Refund workaround (from support calls)</div>
-            <span class="pill pill-gray">Manuals</span>
-            <span class="pill pill-outline">Candidate</span>
-          </div>
-          <div class="k-row-desc">Workaround for the expediente-incompleto refund issue, consolidated from support notes.</div>
-          <div class="k-row-prov">Published from Ana's notes · Jul 8</div>
-        </a>
-
-        <div class="list-empty" data-empty-state hidden>
-          <div class="list-empty-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.964L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></div>
-          <div class="list-empty-line1">Nothing filed under <span class="empty-category"></span> yet</div>
-          <div class="list-empty-line2">Pieces are filed here automatically as meetings and files are processed.</div>
+        <div class="crumb">
+          <a href="knowledge.html">Knowledge</a>
+          <span>/</span>
+          <span class="cur">Mortgage underwriting macro process</span>
         </div>
 
-      </div>
-    </div>
-  </div>
-
-  <a class="drawer-scrim" href="knowledge.html" aria-label="Close"></a>
-  <div class="drawer">
-    <div class="drawer-head">
-      <h2 class="drawer-title">Mortgage underwriting macro process</h2>
-      <a class="icon-btn" href="knowledge.html" title="Close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-      </a>
-    </div>
-
-    <div class="k-meta">
-      <div class="k-meta-row">
-        <div class="k-meta-label">Type</div>
-        <span class="pill pill-tag">Macro process</span>
-      </div>
-      <div class="k-meta-row">
-        <div class="k-meta-label">Trust</div>
-        <div class="k-meta-value" id="trust-value">Verified · last verified Jun 20</div>
-      </div>
-      <div class="k-meta-row">
-        <div class="k-meta-label">Confidence</div>
-        <div class="k-meta-value confidence">High <span class="pct">(92%)</span></div>
-      </div>
-      <div class="k-meta-row">
-        <div class="k-meta-label">Verified by</div>
-        <div class="k-meta-value">Javier Aldape · Jun 20</div>
-      </div>
-      <div class="k-meta-row">
-        <div class="k-meta-label">Owner</div>
-        <div class="k-meta-value">—</div>
-      </div>
-    </div>
-
-    <div id="overview-block">
-      <div class="t-section">Generated overview</div>
-      <p class="k-review-line" style="margin:8px 0 0;">Covers loan intake through funding across five stages. Two controls monitor completeness and data-sharing; one is past its verification window and needs review.</p>
-    </div>
-
-    <div class="k-connections" id="connections-block">
-      <div class="t-section">Connections</div>
-
-      <div class="k-group">
-        <div class="t-section">Policies (1)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Data-sharing policy</span></div></div>
+        <div class="detail-header doc-header-v2">
+          <div class="detail-title-col">
+            <h1 class="t-page-title">Mortgage underwriting macro process</h1>
+            <div class="doc-meta-group">
+              <div class="doc-meta-item"><span class="doc-meta-label">Type</span><span class="doc-meta-value">Macro process</span></div>
+              <span class="doc-meta-sep"></span>
+              <div class="doc-meta-item"><span class="doc-meta-label">Verified by</span><span class="doc-meta-value">Javier Aldape &middot; Jun 20</span></div>
+              <span class="doc-meta-sep"></span>
+              <div class="doc-meta-item"><span class="doc-meta-label">Owner</span><span class="doc-meta-value">&mdash;</span></div>
+            </div>
+          </div>
+          <div class="doc-header-actions">
+            <span class="row-menu">
+              <button class="icon-btn" data-menu>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+              </button>
+              <div class="menu-popover">
+                <div class="menu-item" onclick="markVerified()">Verify</div>
+                <div class="menu-item" data-toast="Not in this prototype yet">View history</div>
+                <div class="menu-item danger" onclick="document.getElementById('archive-overlay').hidden=false">Archive</div>
+              </div>
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div class="k-group">
-        <div class="t-section">Functional processes (3)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Loan file intake</span></div></div>
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Underwriting review</span></div></div>
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Approval & funding</span></div></div>
+        <div class="doc-body">
+          <div class="doc-paper">
+            <div class="doc-toolbar">
+              <span class="pill pill-green" id="trust-chip">Verified</span>
+              <div class="doc-toolbar-right">
+                <span class="doc-toolbar-label">Last edited Jun 20</span>
+                <button type="button" class="icon-btn" title="Edit" data-toast="Not in this prototype yet">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                </button>
+              </div>
+            </div>
+            <div id="doc-paper-body">
+              <div class="doc-section">
+                <h3 class="doc-section-h">1. Application intake</h3>
+                <p class="doc-section-body">Borrower submits the application and initial documents through the broker portal. Loan file intake checks the file against the completeness checklist ("expediente completo") before it moves forward; incomplete files are returned to the broker with the missing items flagged.</p>
+              </div>
+
+              <div class="doc-section">
+                <h3 class="doc-section-h">2. Underwriting review</h3>
+                <p class="doc-section-body">Underwriting scores the file and verifies income, credit, and property documentation. The minimum file score to proceed is 80 (raised from 75 on Jun 20). Files below the threshold are sent back for additional documentation or declined.</p>
+              </div>
+
+              <div class="doc-section">
+                <h3 class="doc-section-h">3. Approval &amp; funding</h3>
+                <p class="doc-section-body">Approved files move to final sign-off and funding. Data-sharing clauses in any partner-originated file are checked against the data-sharing redline review checklist before funds are released.</p>
+              </div>
+
+              <div class="doc-section">
+                <h3 class="doc-section-h">4. Ongoing controls</h3>
+                <p class="doc-section-body">Two controls monitor this process day to day: the expediente completo check (daily, currently stale &mdash; past its 60-day verification window) and the data-sharing redline review checklist (verified). Both are reviewed in the weekly partner sync.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-rail">
+            <div class="rel-card">
+              <div class="rel-card-head"><span class="rel-card-title">Related policies</span></div>
+              <div class="rel-card-divider"></div>
+              <div class="rel-list">
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Data-sharing policy</span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+              </div>
+            </div>
+
+            <div class="rel-card">
+              <div class="rel-card-head"><span class="rel-card-title">Related functional processes</span></div>
+              <div class="rel-card-divider"></div>
+              <div class="rel-list">
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Loan file intake</span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Underwriting review</span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Approval &amp; funding</span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+              </div>
+            </div>
+
+            <div class="rel-card">
+              <div class="rel-card-head"><span class="rel-card-title">Related controls</span></div>
+              <div class="rel-card-divider"></div>
+              <div class="rel-list">
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Data-sharing redline review checklist &mdash; Verified</span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Expediente completo check &mdash; <span class="amber">Stale</span></span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+              </div>
+            </div>
+
+            <div class="rel-card">
+              <div class="rel-card-head"><span class="rel-card-title">Related rituals</span></div>
+              <div class="rel-card-divider"></div>
+              <div class="rel-list">
+                <a class="rel-item" href="#"><span class="rel-item-text"><span class="rel-item-main">Weekly partner sync</span><span class="rel-item-sub">Meeting series (Mon 9:00) + pre-meeting digest</span></span><svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div class="k-group">
-        <div class="t-section">Controls (2)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Data-sharing redline review checklist — Verified</span></div></div>
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Expediente completo check — <span class="amber">Stale</span></span></div></div>
-        </div>
-      </div>
-
-      <div class="k-group">
-        <div class="t-section">Rituals (1)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Weekly partner sync</span><span class="k-conn-sub">Runs as: meeting series (Mon 9:00) + automation: pre-meeting digest</span></div></div>
-        </div>
-      </div>
-
-      <div class="k-group">
-        <div class="t-section">Manuals (1)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Loan file completeness checklist</span></div></div>
-        </div>
-      </div>
-
-      <div class="k-group">
-        <div class="t-section">Decisions (2)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Jul 6 — Proceed with Bancora co-branded pilot</span></div></div>
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Jun 20 — Raised minimum file score to 80</span></div></div>
-        </div>
-      </div>
-
-      <div class="k-group">
-        <div class="t-section">Tools (1)</div>
-        <div class="k-conn-rows">
-          <div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">POS / underwriting system</span></div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="k-panel-footer" id="footer-block">
-      <a class="k-footer-link" href="#" onclick="event.preventDefault();markVerified()">Verify</a>
-      <span class="k-footer-dot">·</span>
-      <a class="k-footer-link" href="#" data-toast="Not in this prototype yet">Edit</a>
-      <span class="k-footer-dot">·</span>
-      <a class="k-footer-link" href="#" data-toast="Not in this prototype yet">View history</a>
-      <span class="k-footer-spacer"></span>
-      <a class="k-footer-archive" href="#" onclick="event.preventDefault();document.getElementById('archive-overlay').hidden=false">Archive</a>
     </div>
   </div>
 
@@ -387,9 +321,12 @@
 <script src="assets/records.js"></script>
 <script src="assets/app.js"></script>
 <script>
-// D19 — thin real shell for every Knowledge piece other than the flagship
-// "Mortgage underwriting macro process". Real title/category/trust/note only —
-// no invented connections graph.
+// Thin real shell for every Knowledge piece other than the flagship
+// "Mortgage underwriting macro process" — real title/category/trust/note
+// only, no invented connections graph (matches the D19 approach from the
+// old drawer, ported onto the full-page layout).
+var ARROW_SVG = '<svg class="arrow-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>';
+
 var KDID = new URLSearchParams(location.search).get('id') || 'mortgage-macro';
 // The pending Bancora overview edit renders honestly on the review page;
 // this page's thin shell would show its off-canon record fields raw.
@@ -397,61 +334,71 @@ if (KDID === 'k-bancora-overview') location.replace('knowledge-review.html?id=k-
 var KD = window.NYSA.KNOWLEDGE[KDID];
 if (!KD) { KDID = 'mortgage-macro'; KD = window.NYSA.KNOWLEDGE[KDID]; }
 
-if (KDID !== 'mortgage-macro') {
-  document.querySelectorAll('.card').forEach(function (c) {
-    var t = c.querySelector('.k-row-title');
-    c.classList.toggle('active', !!t && t.textContent.indexOf(KD.title) === 0);
-  });
-  document.querySelector('.drawer-title').textContent = KD.title;
-  // D50, option A — Confidence row, e.g. "High (92%)"; the "(92%)" part muted.
-  var confMatch = /^(.*)\s(\(\d+%\))$/.exec(KD.confidence || '');
-  var confRow = confMatch
-    ? '<div class="k-meta-row"><div class="k-meta-label">Confidence</div><div class="k-meta-value confidence">' + confMatch[1] + ' <span class="pct">' + confMatch[2] + '</span></div></div>'
-    : '';
-  // Spec v0.8 — Source (provenance link back to the email/meeting that
-  // captured this piece), Verified by (Verified pieces), Decided by
-  // (Decision-type pieces). Data-driven: a piece without the field simply
-  // doesn't render the row.
-  var sourceRow = KD.source
-    ? '<div class="k-meta-row"><div class="k-meta-label">Source</div><div class="k-meta-value">' + (KD.sourceHref ? '<a href="' + KD.sourceHref + '">' + KD.source + '</a>' : KD.source) + '</div></div>'
-    : '';
-  var verifiedRow = KD.verifiedBy
-    ? '<div class="k-meta-row"><div class="k-meta-label">Verified by</div><div class="k-meta-value">' + KD.verifiedBy + '</div></div>'
-    : '';
-  var decidedRow = KD.decidedBy
-    ? '<div class="k-meta-row"><div class="k-meta-label">Decided by</div><div class="k-meta-value">' + KD.decidedBy + '</div></div>'
-    : '';
-  document.querySelector('.k-meta').innerHTML =
-    '<div class="k-meta-row"><div class="k-meta-label">Type</div><span class="pill pill-tag">' + KD.category + '</span></div>' +
-    '<div class="k-meta-row"><div class="k-meta-label">Trust</div><div class="k-meta-value" id="trust-value">' + KD.trust + '</div></div>' +
-    confRow +
-    sourceRow +
-    verifiedRow +
-    decidedRow +
-    '<div class="k-meta-row"><div class="k-meta-label">Owner</div><div class="k-meta-value">—</div></div>';
-  document.getElementById('overview-block').innerHTML =
-    '<div class="t-section">Note</div>' +
-    '<p class="k-review-line" style="margin:8px 0 0;">' + (KD.note || 'No additional detail has been captured for this piece yet.') + '</p>';
-  // D36, option A — the jul6-decision piece is itself a Decision record now;
-  // its Connections link to the real source meeting and the decision's own
-  // drawer instead of claiming "not modeled."
-  if (KDID === 'jul6-decision') {
-    document.getElementById('connections-block').innerHTML =
-      '<div class="t-section">Connections</div>' +
-      '<div class="k-conn-rows" style="margin-top:8px;">' +
-        '<div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Source meeting: <a href="meeting-bancora.html">Bancora sync \u2014 Jul 6</a></span></div></div>' +
-        '<div class="k-conn-row"><span class="k-conn-dot"></span><div class="k-conn-text"><span class="k-conn-main">Full decision record: <a href="decision-detail.html?id=jul6-decision">View decision</a></span></div></div>' +
-      '</div>';
-  } else {
-    document.getElementById('connections-block').innerHTML = '<div class="t-section">Connections</div><p class="k-review-line" style="margin:8px 0 0;">Not modeled in this prototype yet.</p>';
-  }
-  document.getElementById('footer-block').innerHTML = '<a class="k-footer-link" href="#" onclick="event.preventDefault();markVerified()">Verify</a><span class="k-footer-spacer"></span><a class="k-footer-archive" href="#" onclick="event.preventDefault();document.getElementById(\'archive-overlay\').hidden=false">Archive</a>';
+function trustPillClass(trust) {
+  if (/Verified/.test(trust)) return 'pill-green';
+  if (/Stale/.test(trust)) return 'pill-amber';
+  return 'pill-gray';
 }
 
-// Verify: prototype-only local state — refresh the trust line and confirm.
+function lastEditedLabel(kd) {
+  // Only verifiedBy reads naturally as "last edited" — decidedBy pieces
+  // were decided, not edited, so they get no toolbar date at all.
+  var parts = (kd.verifiedBy || '').split('·');
+  return parts.length > 1 ? 'Last edited ' + parts[1].trim() : '';
+}
+
+if (KDID !== 'mortgage-macro') {
+  document.title = KD.title + ' — Knowledge — NYSA';
+  document.querySelector('.crumb .cur').textContent = KD.title;
+  document.querySelector('.t-page-title').textContent = KD.title;
+
+  // Meta group: Type always; Verified by (Verified pieces) or Decided by
+  // (Decision-type pieces) when present; Owner always last (spec v0.8).
+  var metaParts = ['<div class="doc-meta-item"><span class="doc-meta-label">Type</span><span class="doc-meta-value">' + KD.category + '</span></div>'];
+  if (KD.verifiedBy) {
+    metaParts.push('<span class="doc-meta-sep"></span><div class="doc-meta-item"><span class="doc-meta-label">Verified by</span><span class="doc-meta-value">' + KD.verifiedBy + '</span></div>');
+  } else if (KD.decidedBy) {
+    metaParts.push('<span class="doc-meta-sep"></span><div class="doc-meta-item"><span class="doc-meta-label">Decided by</span><span class="doc-meta-value">' + KD.decidedBy + '</span></div>');
+  }
+  metaParts.push('<span class="doc-meta-sep"></span><div class="doc-meta-item"><span class="doc-meta-label">Owner</span><span class="doc-meta-value">—</span></div>');
+  document.querySelector('.doc-meta-group').innerHTML = metaParts.join('');
+
+  // Toolbar: trust chip + last-edited label (hidden when there's no date to show).
+  var chip = document.getElementById('trust-chip');
+  chip.className = 'pill ' + trustPillClass(KD.trust);
+  chip.textContent = KD.trust;
+  var label = lastEditedLabel(KD);
+  var labelEl = document.querySelector('.doc-toolbar-label');
+  if (label) labelEl.textContent = label; else labelEl.style.display = 'none';
+
+  // Body: Source (provenance link, when present) then Note.
+  var bodyHtml = '';
+  if (KD.source) {
+    var srcLine = KD.sourceHref ? '<a href="' + KD.sourceHref + '">' + KD.source + '</a>' : KD.source;
+    bodyHtml += '<div class="doc-section"><h3 class="doc-section-h">Source</h3><p class="doc-section-body">' + srcLine + '</p></div>';
+  }
+  bodyHtml += '<div class="doc-section"><h3 class="doc-section-h">Note</h3><p class="doc-section-body">' + (KD.note || 'No additional detail has been captured for this piece yet.') + '</p></div>';
+  document.getElementById('doc-paper-body').innerHTML = bodyHtml;
+
+  // Connections: the jul6-decision piece is itself a Decision record, so it
+  // links to its real source meeting and its own decision record instead of
+  // claiming "not modeled."
+  var railHtml;
+  if (KDID === 'jul6-decision') {
+    railHtml = '<div class="rel-card"><div class="rel-card-head"><span class="rel-card-title">Connections</span></div><div class="rel-card-divider"></div><div class="rel-list">' +
+      '<a class="rel-item" href="meeting-bancora.html"><span class="rel-item-text"><span class="rel-item-main">Source meeting: Bancora sync — Jul 6</span></span>' + ARROW_SVG + '</a>' +
+      '<a class="rel-item" href="decision-detail.html?id=jul6-decision"><span class="rel-item-text"><span class="rel-item-main">Full decision record</span></span>' + ARROW_SVG + '</a>' +
+    '</div></div>';
+  } else {
+    railHtml = '<div class="rel-card"><div class="rel-card-head"><span class="rel-card-title">Connections</span></div><div class="rel-card-divider"></div><div class="rel-list"><div class="rel-empty">Not modeled in this prototype yet.</div></div></div>';
+  }
+  document.querySelector('.doc-rail').innerHTML = railHtml;
+}
+
+// Verify: prototype-only local state — flip the chip to Verified and confirm.
 function markVerified() {
-  var el = document.getElementById('trust-value');
-  if (el) el.textContent = 'Verified · last verified today';
+  var chip = document.getElementById('trust-chip');
+  if (chip) { chip.className = 'pill pill-green'; chip.textContent = 'Verified'; }
   showToast('Marked as verified');
 }
 </script>
